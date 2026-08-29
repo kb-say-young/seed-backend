@@ -1,0 +1,72 @@
+name: '이슈 생성'
+description: '개발 작업을 위한 GitHub 이슈를 생성합니다.'
+title: '이슈 제목을 작성해 주세요'
+labels: []
+assignees: []
+
+body:
+  - type: dropdown
+    id: branchType
+    attributes:
+      label: '🌿 브랜치 타입'
+      description: '실제 코드 변경 성격에 맞는 Git 컨벤션을 선택해 주세요.'
+      options:
+        - feat
+        - fix
+        - docs
+        - style
+        - refactor
+        - test
+        - chore
+        - design
+        - comment
+        - rename
+        - remove
+        - '!HOTFIX'
+    validations:
+      required: true
+
+  - type: input
+    id: domainName
+    attributes:
+      label: '📦 도메인 이름'
+      description: '작업 대상 도메인 또는 기능 영역을 영문 소문자로 작성해 주세요.'
+      placeholder: '예: user, order, auth, payment'
+    validations:
+      required: true
+
+  - type: input
+    id: detailName
+    attributes:
+      label: '🌳 세부 기능'
+      description: '구현하거나 수정할 세부 기능을 영문 kebab-case로 작성해 주세요.'
+      placeholder: '예: create-api, update-profile, validation-fix'
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: '📝 상세 내용'
+      description: '개발할 기능이나 해결할 문제를 구체적으로 설명해 주세요.'
+      placeholder: |
+        구현하거나 수정하려는 내용을 작성해 주세요.
+
+        예:
+        - 기능 구현 목적
+        - 주요 동작
+        - 고려해야 할 사항
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: '✅ 체크리스트'
+      description: '이슈에서 수행할 세부 작업을 체크리스트로 작성해 주세요.'
+      value: |
+        - [ ] 
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
