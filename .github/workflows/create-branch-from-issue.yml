@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Create branch
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const body = context.payload.issue.body || '';
@@ -70,9 +70,30 @@ jobs:
               return;
             }
 
-            // feat/auth-login-api-31
+            // 브랜치명 생성
+            // 예: feat/auth-login-api-31
             const branchName =
               `${type}/${domain}-${detail}-${issueNumber}`;
+
+            // 이슈 제목 자동 변경
+            // 예: 로그인 API 구현 -> feat: 로그인 API 구현
+            const currentTitle = context.payload.issue.title;
+
+            const titlePrefixPattern =
+              /^(feat|fix|docs|style|refactor|test|chore|design|comment|rename|remove|hotfix):\s*/i;
+
+            const cleanTitle = currentTitle
+              .replace(titlePrefixPattern, '')
+              .trim();
+
+            const newTitle = `${type}: ${cleanTitle}`;
+
+            await github.rest.issues.update({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              title: newTitle
+            });
 
             // 최신 develop 브랜치 조회
             const developRef = await github.rest.git.getRef({
@@ -102,7 +123,7 @@ jobs:
               }
             }
 
-            // develop 최신 커밋 기준으로 브랜치 생성
+            // 최신 develop 커밋 기준으로 브랜치 생성
             await github.rest.git.createRef({
               owner,
               repo,
@@ -132,6 +153,10 @@ jobs:
               issue_number: issueNumber,
               body: comment
             });
+
+            core.info(
+              `Issue title updated: ${newTitle}`
+            );
 
             core.info(
               `Created ${branchName} from develop (${developSha})`
