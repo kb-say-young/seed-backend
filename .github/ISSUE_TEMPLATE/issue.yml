@@ -22,7 +22,7 @@ body:
         - comment
         - rename
         - remove
-        - '!HOTFIX'
+        - hotfix
     validations:
       required: true
 
