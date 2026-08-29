@@ -1,6 +1,6 @@
 name: '이슈 생성'
 description: '개발 작업을 위한 GitHub 이슈를 생성합니다.'
-title: ' '
+title: '이슈 제목을 작성해 주세요'
 labels: []
 assignees: []
 
