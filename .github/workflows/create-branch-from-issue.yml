@@ -1,0 +1,138 @@
+name: Create Branch from Issue
+
+on:
+  issues:
+    types:
+      - opened
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create branch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const issueNumber = context.issue.number;
+            const { owner, repo } = context.repo;
+
+            function getField(label) {
+              const escapedLabel = label.replace(
+                /[.*+?^${}()|[\]\\]/g,
+                '\\$&'
+              );
+
+              const regex = new RegExp(
+                `###\\s+${escapedLabel}\\s*\\n+([\\s\\S]*?)(?=\\n+###\\s+|$)`
+              );
+
+              const match = body.match(regex);
+
+              return match ? match[1].trim() : null;
+            }
+
+            function normalize(value) {
+              return value
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9-]/g, '')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+            }
+
+            // Issue Form 값 추출
+            const branchType = getField('🌿 브랜치 타입');
+            const domainName = getField('📦 도메인 이름');
+            const detailName = getField('🌳 세부 기능');
+
+            if (!branchType || !domainName || !detailName) {
+              core.setFailed(
+                '브랜치 생성에 필요한 이슈 정보를 찾을 수 없습니다.'
+              );
+              return;
+            }
+
+            const type = normalize(branchType);
+            const domain = normalize(domainName);
+            const detail = normalize(detailName);
+
+            if (!type || !domain || !detail) {
+              core.setFailed(
+                '브랜치명을 생성할 수 없습니다. 입력값을 확인해 주세요.'
+              );
+              return;
+            }
+
+            // feat/auth-login-api-31
+            const branchName =
+              `${type}/${domain}-${detail}-${issueNumber}`;
+
+            // 최신 develop 브랜치 조회
+            const developRef = await github.rest.git.getRef({
+              owner,
+              repo,
+              ref: 'heads/develop'
+            });
+
+            const developSha = developRef.data.object.sha;
+
+            // 동일한 브랜치가 이미 존재하는지 확인
+            try {
+              await github.rest.git.getRef({
+                owner,
+                repo,
+                ref: `heads/${branchName}`
+              });
+
+              core.setFailed(
+                `이미 존재하는 브랜치입니다: ${branchName}`
+              );
+
+              return;
+            } catch (error) {
+              if (error.status !== 404) {
+                throw error;
+              }
+            }
+
+            // develop 최신 커밋 기준으로 브랜치 생성
+            await github.rest.git.createRef({
+              owner,
+              repo,
+              ref: `refs/heads/${branchName}`,
+              sha: developSha
+            });
+
+            // 이슈에 안내 댓글 작성
+            const comment = [
+              '✅ 작업 브랜치가 자동으로 생성되었습니다.',
+              '',
+              `- 이슈: #${issueNumber}`,
+              `- 브랜치: \`${branchName}\``,
+              '- 기준 브랜치: `develop`',
+              '',
+              '로컬에서 아래 명령어를 복사하여 실행하세요.',
+              '',
+              '```bash',
+              'git fetch origin',
+              `git switch --track origin/${branchName}`,
+              '```'
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body: comment
+            });
+
+            core.info(
+              `Created ${branchName} from develop (${developSha})`
+            );
