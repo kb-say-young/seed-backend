@@ -31,7 +31,7 @@ body:
     attributes:
       label: '📦 도메인 이름'
       description: '작업 대상 도메인 또는 기능 영역을 영문 소문자로 작성해 주세요.'
-      placeholder: '예: user, order, auth, payment'
+      placeholder: '예: user, policy, ai, others'
     validations:
       required: true
 
