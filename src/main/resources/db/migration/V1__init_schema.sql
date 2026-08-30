@@ -1,0 +1,5 @@
+CREATE TABLE users
+(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (id)
+);

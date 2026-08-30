@@ -1,3 +1,15 @@
 spring:
   application:
-    name: seed-backend
+    name: seed
+
+  profiles:
+    active: local
+
+  config:
+    import:
+      - optional:classpath:application-secret.yml
+
+logging:
+  level:
+    root: INFO
+    com.sayyoung.seed: INFO
