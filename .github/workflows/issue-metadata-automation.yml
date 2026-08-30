@@ -1,0 +1,17 @@
+name: Issue metadata automation
+
+# 실제 로직은 kb-say-young/.github 리포의 재사용 가능한 워크플로에 있습니다.
+# 이 파일은 3개 저장소 모두에 동일하게 복사해 넣으면 됩니다.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  call-metadata-automation:
+    uses: kb-say-young/.github/.github/workflows/issue-metadata-automation.yml@main
+    secrets: inherit
