@@ -1,6 +1,6 @@
 package com.sayyoung.seed.global.exception;
 
-import com.sayyoung.seed.global.response.ErrorResponse;
+import com.sayyoung.seed.global.response.ApiResponse;
 import com.sayyoung.seed.global.response.ResponseFactory;
 import com.sayyoung.seed.global.response.code.CommonErrorCode;
 import jakarta.validation.ConstraintViolationException;
@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
      * 비즈니스 로직에서 발생한 예외를 처리합니다.
      */
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(
+    public ResponseEntity<ApiResponse<Void>> handleBusinessException(
             BusinessException e
     ) {
         log.warn(
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
      * @RequestBody와 @Valid를 통한 요청 값 검증 실패를 처리합니다.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException e
     ) {
         String message = e.getBindingResult()
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
      * 요청 본문의 JSON 형식이 올바르지 않은 경우를 처리합니다.
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+    public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException e
     ) {
         log.warn(
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
      * PathVariable 또는 RequestParam의 타입 변환 실패를 처리합니다.
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException e
     ) {
         log.warn(
@@ -103,7 +103,7 @@ public class GlobalExceptionHandler {
      * 필수 RequestParam이 누락된 경우를 처리합니다.
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
+    public ResponseEntity<ApiResponse<Void>> handleMissingServletRequestParameterException(
             MissingServletRequestParameterException e
     ) {
         log.warn(
@@ -120,7 +120,7 @@ public class GlobalExceptionHandler {
      * @Validated를 통한 파라미터 제약 조건 검증 실패를 처리합니다.
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+    public ResponseEntity<ApiResponse<Void>> handleConstraintViolationException(
             ConstraintViolationException e
     ) {
         String message = e.getConstraintViolations()
@@ -144,7 +144,7 @@ public class GlobalExceptionHandler {
      * 존재하지 않는 API 또는 정적 리소스 요청을 처리합니다.
      */
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNoResourceFoundException(
+    public ResponseEntity<ApiResponse<Void>> handleNoResourceFoundException(
             NoResourceFoundException e
     ) {
         log.warn(
@@ -161,7 +161,7 @@ public class GlobalExceptionHandler {
      * 별도로 처리되지 않은 예상치 못한 예외를 처리합니다.
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(
+    public ResponseEntity<ApiResponse<Void>> handleException(
             Exception e
     ) {
         log.error(
