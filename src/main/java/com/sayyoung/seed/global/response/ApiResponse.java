@@ -1,6 +1,7 @@
 package com.sayyoung.seed.global.response;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sayyoung.seed.global.response.code.ErrorResponseCode;
 import com.sayyoung.seed.global.response.code.SuccessCode;
 import lombok.Getter;
 
@@ -58,6 +59,35 @@ public class ApiResponse<T> {
                 true,
                 successCode.getCode(),
                 successCode.getMessage(),
+                null
+        );
+    }
+
+    /**
+     * 기본 메시지를 사용하는 실패 응답을 생성합니다.
+     */
+    public static ApiResponse<Void> failure(
+            ErrorResponseCode errorCode
+    ) {
+        return new ApiResponse<>(
+                false,
+                errorCode.getCode(),
+                errorCode.getMessage(),
+                null
+        );
+    }
+
+    /**
+     * 별도의 메시지를 사용하는 실패 응답을 생성합니다.
+     */
+    public static ApiResponse<Void> failure(
+            ErrorResponseCode errorCode,
+            String message
+    ) {
+        return new ApiResponse<>(
+                false,
+                errorCode.getCode(),
+                message,
                 null
         );
     }
