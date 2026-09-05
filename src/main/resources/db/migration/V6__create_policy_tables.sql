@@ -19,7 +19,7 @@ CREATE TABLE policies (
 
     min_age INT NULL COMMENT '지원 최소 연령',
     max_age INT NULL COMMENT '지원 최대 연령',
-    age_limit BOOLEAN NULL COMMENT '연령 제한 여부',
+    age_limit BOOLEAN NOT NULL COMMENT '연령 제한 여부',
 
     income_code VARCHAR(20) NULL COMMENT '소득 조건 구분 코드',
     income_min BIGINT NULL COMMENT '최소 소득 조건, 원 단위',
