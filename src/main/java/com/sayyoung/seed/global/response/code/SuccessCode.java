@@ -15,6 +15,12 @@ public enum SuccessCode implements ResponseCode {
             HttpStatus.OK,
             "COMMON_200",
             "요청에 성공했습니다."
+    ),
+
+    COMMON_CREATED(
+            HttpStatus.CREATED,
+            "COMMON_201",
+            "리소스가 생성되었습니다."
     );
 
     private final HttpStatus httpStatus;
