@@ -5,9 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface PolicyRepository extends JpaRepository<Policy, Long> {
+/**
+ * Policy 기본 CRUD와 QueryDSL 정책 조회 기능을 제공한다.
+ */
+public interface PolicyRepository extends JpaRepository<Policy, Long>, PolicyQueryRepository {
 
-    // 정책 식별번호로 정책을 조회한다.
+    // 온통청년 정책번호로 정책 조회
     Optional<Policy> findByPolicyNo(
             String policyNo
     );
