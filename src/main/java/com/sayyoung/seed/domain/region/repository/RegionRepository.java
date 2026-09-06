@@ -4,6 +4,7 @@ import com.sayyoung.seed.domain.region.entity.Region;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 지역 정보 조회를 담당하는 리포지토리입니다.
@@ -34,6 +35,16 @@ public interface RegionRepository extends JpaRepository<Region, Long> {
      * @return 시도 코드가 존재하면 true, 존재하지 않으면 false
      */
     boolean existsByRegionCodeAndParentCodeIsNull(
+            String regionCode
+    );
+
+    /**
+     * 지역 코드로 지역 정보를 조회합니다.
+     *
+     * @param regionCode 조회할 지역 코드
+     * @return 조회된 지역 정보
+     */
+    Optional<Region> findByRegionCode(
             String regionCode
     );
 }
