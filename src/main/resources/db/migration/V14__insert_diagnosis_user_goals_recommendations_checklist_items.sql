@@ -1,14 +1,14 @@
 -- diagnosis / user_goals / recommendations / checklist_items 로컬·개발 테스트용 샘플 데이터
--- Flyway V13
+-- Flyway V14
 -- users에는 아직 샘플 데이터를 넣는 마이그레이션이 없어 FK 충족을 위해 테스트용 사용자도 함께 적재한다.
 -- 모든 PK는 빈 테이블 기준(AUTO_INCREMENT 시작값 1)으로 명시적으로 지정했다.
 
 SET NAMES utf8mb4;
 START TRANSACTION;
 
-INSERT INTO users (id) VALUES
-(1),
-(2);
+INSERT INTO users (user_id, login_id) VALUES
+(1, 'testuser1'),
+(2, 'testuser2');
 
 INSERT INTO diagnosis (diagnosis_id, user_id, status, summary) VALUES
 (1, 1, 'completed', '주거비 부담 완화 및 저축 습관 형성을 위한 진단이 완료되었습니다.'),
