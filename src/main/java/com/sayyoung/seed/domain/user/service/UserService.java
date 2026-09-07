@@ -115,7 +115,7 @@ public class UserService {
                 profile.getRegionCode(),
                 profile.getIncome(),
                 profile.getBasicRecipient(),
-                profile.getHouseholdSize()
+                profile.getHouseholdSize().shortValue()
         );
 
         userGoalRepository.deleteAllByUserId(userId);

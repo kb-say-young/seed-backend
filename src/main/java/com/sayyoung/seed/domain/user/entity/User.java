@@ -54,7 +54,7 @@ public class User {
     private Boolean basicRecipient;
 
     @Column(name = "household_size")
-    private Integer householdSize;
+    private Short householdSize;
 
     @Column(name = "budget")
     private Long budget;
@@ -90,7 +90,7 @@ public class User {
             String regionCode,
             Long income,
             Boolean basicRecipient,
-            Integer householdSize
+            Short householdSize
     ) {
         this.protectionEndDate = protectionEndDate;
         this.youthSupport = youthSupport;
