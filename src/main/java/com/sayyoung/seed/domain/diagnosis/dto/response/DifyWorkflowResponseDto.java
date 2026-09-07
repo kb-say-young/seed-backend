@@ -15,7 +15,7 @@ import java.util.List;
 @Schema(description = "Dify 로드맵 생성 워크플로우 응답")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DifyResponseDto {
+public class DifyWorkflowResponseDto {
 
     @Schema(description = "사용자 목표별 로드맵(추천) 항목 목록")
     @JsonProperty("roadmap_items")
