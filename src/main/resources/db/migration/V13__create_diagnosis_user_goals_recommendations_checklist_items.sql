@@ -18,7 +18,7 @@ CREATE TABLE diagnosis (
 
     CONSTRAINT fk_diagnosis_user
         FOREIGN KEY (user_id)
-        REFERENCES users (id)
+        REFERENCES users (user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
 
@@ -57,7 +57,7 @@ CREATE TABLE user_goals (
 
     CONSTRAINT fk_user_goals_user
         FOREIGN KEY (user_id)
-        REFERENCES users (id)
+        REFERENCES users (user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
 

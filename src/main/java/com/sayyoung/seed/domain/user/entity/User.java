@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -20,10 +21,20 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(name = "login_id", nullable = false, unique = true, length = 30)
     private String loginId;
+
+    @Column(name = "name", length = 20)
+    private String name;
+
+    @Column(name = "birth_date", length = 8)
+    private String birthDate;
+
+    @Column(name = "phone_number", length = 11)
+    private String phoneNumber;
 
     @Column(name = "protection_end_date")
     private LocalDate protectionEndDate;
@@ -32,7 +43,7 @@ public class User {
     private Boolean youthSupport;
 
     @Column(name = "fixed_budget")
-    private Long fixedBudget;
+    private BigDecimal fixedBudget;
 
     @Column(name = "region_code", length = 5)
     private String regionCode;
@@ -44,7 +55,13 @@ public class User {
     private Boolean basicRecipient;
 
     @Column(name = "household_size")
-    private Integer householdSize;
+    private Short householdSize;
+
+    @Column(name = "budget")
+    private BigDecimal budget;
+
+    @Column(name = "has_cda")
+    private Boolean hasCda;
 
     private User(
             String loginId
@@ -70,11 +87,11 @@ public class User {
     public void updateProfile(
             LocalDate protectionEndDate,
             Boolean youthSupport,
-            Long fixedBudget,
+            BigDecimal fixedBudget,
             String regionCode,
             Long income,
             Boolean basicRecipient,
-            Integer householdSize
+            Short householdSize
     ) {
         this.protectionEndDate = protectionEndDate;
         this.youthSupport = youthSupport;

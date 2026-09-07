@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
@@ -111,11 +112,11 @@ public class UserService {
         user.updateProfile(
                 profile.getProtectionEndDate(),
                 profile.getYouthSupport(),
-                profile.getFixedBudget(),
+                BigDecimal.valueOf(profile.getFixedBudget()),
                 profile.getRegionCode(),
                 profile.getIncome(),
                 profile.getBasicRecipient(),
-                profile.getHouseholdSize()
+                profile.getHouseholdSize().shortValue()
         );
 
         userGoalRepository.deleteAllByUserId(userId);
