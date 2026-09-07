@@ -25,11 +25,11 @@ ALTER TABLE users
     ADD COLUMN is_youth_support BOOLEAN NULL COMMENT '자립준비청년 신청 여부',
     ADD COLUMN region_code VARCHAR(5) NULL COMMENT '거주지 지역 코드(시/군/구 레벨, regions.region_code)',
     ADD COLUMN income BIGINT NULL COMMENT '월 평균 소득 금액(원)',
-    ADD COLUMN household_size SMALLINT NULL COMMENT '가구원 수';
+    ADD COLUMN household_size INT NULL COMMENT '가구원 수',
     ADD COLUMN is_basic_recipient BOOLEAN NULL COMMENT '기초생활수급자 여부',
 
-    ADD COLUMN budget DECIMAL(15, 0) NULL COMMENT '배분 가능한 예산, 100억 미만',
-    ADD COLUMN fixed_budget DECIMAL(15, 0) NULL COMMENT '디딤씨앗통장(CDA) 잔액',
+    ADD COLUMN budget BIGINT NULL COMMENT '배분 가능한 예산, 100억 미만',
+    ADD COLUMN fixed_budget BIGINT NULL COMMENT '디딤씨앗통장(CDA) 잔액',
     ADD COLUMN has_cda BOOLEAN NULL COMMENT '디딤씨앗통장(CDA) 보유 여부',
 
     ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
