@@ -7,7 +7,7 @@ spring:
 
   config:
     import:
-      - optional:classpath:application-secret.yml
+      - optional:classpath:application-secret.yaml
 
 jwt:
   access-token-expiration: 1800000 # 30분
