@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -42,7 +43,7 @@ public class User {
     private Boolean youthSupport;
 
     @Column(name = "fixed_budget")
-    private Long fixedBudget;
+    private BigDecimal fixedBudget;
 
     @Column(name = "region_code", length = 5)
     private String regionCode;
@@ -57,7 +58,7 @@ public class User {
     private Short householdSize;
 
     @Column(name = "budget")
-    private Long budget;
+    private BigDecimal budget;
 
     @Column(name = "has_cda")
     private Boolean hasCda;
@@ -86,7 +87,7 @@ public class User {
     public void updateProfile(
             LocalDate protectionEndDate,
             Boolean youthSupport,
-            Long fixedBudget,
+            BigDecimal fixedBudget,
             String regionCode,
             Long income,
             Boolean basicRecipient,
