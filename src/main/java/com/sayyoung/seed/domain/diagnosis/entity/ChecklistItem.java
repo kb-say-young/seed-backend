@@ -35,7 +35,7 @@ public class ChecklistItem {
     private String contents;
 
     @Column(name = "order_no", nullable = false)
-    private Integer orderNo;
+    private Short orderNo;
 
     @Column(name = "estimated_amount", precision = 15, scale = 0)
     private BigDecimal estimatedAmount;
@@ -50,7 +50,7 @@ public class ChecklistItem {
             Recommendation recommendation,
             String itemKey,
             String contents,
-            Integer orderNo,
+            Short orderNo,
             BigDecimal estimatedAmount,
             String status
     ) {
@@ -69,7 +69,7 @@ public class ChecklistItem {
             Recommendation recommendation,
             String itemKey,
             String contents,
-            Integer orderNo,
+            Short orderNo,
             BigDecimal estimatedAmount
     ) {
         return new ChecklistItem(recommendation, itemKey, contents, orderNo, estimatedAmount, STATUS_TODO);

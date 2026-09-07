@@ -94,7 +94,7 @@ class DiagnosisResultServiceTest {
         List<ChecklistItem> checklistItems = checklistItemRepository.findByRecommendationId(saved.getId());
         assertThat(checklistItems).hasSize(1);
         assertThat(checklistItems.get(0).getItemKey()).isEqualTo(checklistKey);
-        assertThat(checklistItems.get(0).getOrderNo()).isEqualTo(1);
+        assertThat(checklistItems.get(0).getOrderNo()).isEqualTo((short) 1);
         assertThat(checklistItems.get(0).getStatus()).isEqualTo("todo");
     }
 

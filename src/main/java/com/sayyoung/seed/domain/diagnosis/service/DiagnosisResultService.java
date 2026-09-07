@@ -128,7 +128,7 @@ public class DiagnosisResultService {
                     recommendation,
                     checklistItem.getItemKey(),
                     checklistItem.getContent(),
-                    i + 1,
+                    (short) (i + 1),
                     toBigDecimal(checklistItem.getEstimatedAmount())
             ));
         }
