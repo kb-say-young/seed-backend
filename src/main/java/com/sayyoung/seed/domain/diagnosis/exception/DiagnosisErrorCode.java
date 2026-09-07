@@ -52,6 +52,18 @@ public enum DiagnosisErrorCode implements ErrorResponseCode {
             HttpStatus.INTERNAL_SERVER_ERROR,
             "DIAGNOSIS_500_001",
             "Dify 요청 데이터 변환에 실패했습니다."
+    ),
+
+    DIFY_RESPONSE_EMPTY(
+            HttpStatus.BAD_GATEWAY,
+            "DIAGNOSIS_502_001",
+            "Dify 응답이 비어 있습니다."
+    ),
+
+    DIFY_API_CALL_FAILED(
+            HttpStatus.BAD_GATEWAY,
+            "DIAGNOSIS_502_002",
+            "Dify API 호출에 실패했습니다."
     );
 
     private final HttpStatus httpStatus;

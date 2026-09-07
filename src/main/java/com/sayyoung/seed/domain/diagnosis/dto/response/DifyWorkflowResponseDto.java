@@ -1,38 +1,23 @@
-package com.sayyoung.seed.domain.diagnosis.dto.dify;
+package com.sayyoung.seed.domain.diagnosis.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sayyoung.seed.domain.diagnosis.dto.RoadmapItemDto;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
- * Dify Workflow API 응답을 받기 위한 DTO.
+ * Dify 로드맵 생성 워크플로우 응답 최상위 DTO입니다.
  */
+@Schema(description = "Dify 로드맵 생성 워크플로우 응답")
 @Getter
-@NoArgsConstructor
-public class DifyWorkflowResponseDto {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class DifyResponseDto {
 
-    // 워크플로우 실행 결과 데이터
-    private Data data;
-
-    /**
-     * Dify 응답의 data 영역.
-     */
-    @Getter
-    @NoArgsConstructor
-    public static class Data {
-
-        private Outputs outputs;
-    }
-
-    /**
-     * Dify END 노드의 출력값.
-     */
-    @Getter
-    @NoArgsConstructor
-    public static class Outputs {
-
-        // AI가 생성한 로드맵 JSON 문자열
-        @JsonProperty("roadmap_json")
-        private String roadmapJson;
-    }
+    @Schema(description = "사용자 목표별 로드맵(추천) 항목 목록")
+    @JsonProperty("roadmap_items")
+    private List<RoadmapItemDto> roadmapItems;
 }
