@@ -42,7 +42,7 @@ public class User {
     @Column(name = "is_youth_support")
     private Boolean youthSupport;
 
-    @Column(name = "fixed_budget")
+    @Column(name = "fixed_budget", precision = 15, scale = 0)
     private BigDecimal fixedBudget;
 
     @Column(name = "region_code", length = 5)
@@ -57,7 +57,7 @@ public class User {
     @Column(name = "household_size")
     private Short householdSize;
 
-    @Column(name = "budget")
+    @Column(name = "budget", precision = 10, scale = 0)
     private BigDecimal budget;
 
     @Column(name = "has_cda")
