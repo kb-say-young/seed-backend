@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * V14 마이그레이션이 적재하는 로컬·개발 테스트용 샘플 데이터(사용자 2, 진단 2, 목표 3 - 카테고리 '23'/'교육 지원금')를
- * 기준으로 검증한다.
+ * V14 마이그레이션이 적재하는 로컬·개발 테스트용 샘플 데이터(사용자 2, 진단 2, 목표 3 - 카테고리 코드 '23', 이름 '교육 지원금')를
+ * 기준으로 검증한다. origin_sub_category는 카테고리 코드로 매칭되므로 테스트 페이로드도 코드('23')를 사용한다.
  */
 @SpringBootTest
 class DiagnosisResultServiceTest {
@@ -56,7 +56,7 @@ class DiagnosisResultServiceTest {
                   "roadmap_items": [
                     {
                       "item_key": "%s",
-                      "origin_sub_category": "교육 지원금",
+                      "origin_sub_category": "23",
                       "order_no": 2,
                       "start_offset": { "value": 1, "unit": "month" },
                       "duration": { "value": 2, "unit": "month" },
@@ -109,7 +109,7 @@ class DiagnosisResultServiceTest {
                   "roadmap_items": [
                     {
                       "item_key": "unknown_category_item",
-                      "origin_sub_category": "존재하지-않는-카테고리",
+                      "origin_sub_category": "99",
                       "order_no": 1,
                       "start_offset": { "value": 0, "unit": "week" },
                       "duration": { "value": 1, "unit": "month" },

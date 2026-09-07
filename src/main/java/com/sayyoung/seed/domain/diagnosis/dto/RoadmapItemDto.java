@@ -20,7 +20,7 @@ public class RoadmapItemDto {
     @JsonProperty("item_key")
     private String itemKey;
 
-    @Schema(description = "원본 세부 카테고리명(categories.name과 매칭해 사용자 목표를 찾는다)", example = "공공임대")
+    @Schema(description = "원본 세부 카테고리 코드(categories.category_id와 매칭해 사용자 목표를 찾는다)", example = "13")
     @JsonProperty("origin_sub_category")
     private String originSubCategory;
 

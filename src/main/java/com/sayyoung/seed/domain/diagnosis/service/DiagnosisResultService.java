@@ -93,7 +93,7 @@ public class DiagnosisResultService {
             Diagnosis diagnosis,
             RoadmapItemDto item
     ) {
-        Category category = categoryRepository.findByName(item.getOriginSubCategory())
+        Category category = categoryRepository.findById(item.getOriginSubCategory())
                 .orElseThrow(() -> new BusinessException(DiagnosisErrorCode.CATEGORY_NOT_FOUND));
         UserGoal goal = userGoalRepository.findByUserAndCategory(diagnosis.getUser(), category)
                 .orElseThrow(() -> new BusinessException(DiagnosisErrorCode.GOAL_NOT_FOUND));
