@@ -26,13 +26,13 @@ public class User {
     @Column(name = "login_id", nullable = false, unique = true, length = 30)
     private String loginId;
 
-    @Column(name = "name", length = 20)
+    @Column(name = "name", nullable = false, length = 20)
     private String name;
 
-    @Column(name = "birth_date", length = 8)
+    @Column(name = "birth_date", nullable = false, length = 8)
     private String birthDate;
 
-    @Column(name = "phone_number", length = 11)
+    @Column(name = "phone_number", nullable = false, length = 11)
     private String phoneNumber;
 
     @Column(name = "protection_end_date")
@@ -63,21 +63,33 @@ public class User {
     private Boolean hasCda;
 
     private User(
-            String loginId
+            String loginId,
+            String name,
+            String birthDate,
+            String phoneNumber
     ) {
         this.loginId = loginId;
+        this.name = name;
+        this.birthDate = birthDate;
+        this.phoneNumber = phoneNumber;
     }
 
     /**
-     * 로그인 아이디만으로 사용자를 생성합니다.
+     * 회원가입 시 입력받은 정보로 사용자를 생성합니다.
      *
-     * @param loginId 로그인 아이디
+     * @param loginId     로그인 아이디
+     * @param name        이름
+     * @param birthDate   생년월일(yyyyMMdd)
+     * @param phoneNumber 휴대폰 번호(하이픈 제외)
      * @return 생성된 사용자 엔티티
      */
     public static User create(
-            String loginId
+            String loginId,
+            String name,
+            String birthDate,
+            String phoneNumber
     ) {
-        return new User(loginId);
+        return new User(loginId, name, birthDate, phoneNumber);
     }
 
     /**
