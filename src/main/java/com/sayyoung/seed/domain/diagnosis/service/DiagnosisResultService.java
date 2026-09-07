@@ -1,7 +1,7 @@
 package com.sayyoung.seed.domain.diagnosis.service;
 
 import com.sayyoung.seed.domain.diagnosis.dto.ChecklistItemDto;
-import com.sayyoung.seed.domain.diagnosis.dto.DifyRoadmapResponse;
+import com.sayyoung.seed.domain.diagnosis.dto.response.DifyWorkflowResponseDto;
 import com.sayyoung.seed.domain.diagnosis.dto.RoadmapItemDto;
 import com.sayyoung.seed.domain.diagnosis.entity.ChecklistItem;
 import com.sayyoung.seed.domain.diagnosis.entity.Diagnosis;
@@ -69,7 +69,7 @@ public class DiagnosisResultService {
         Diagnosis diagnosis = diagnosisRepository.findById(diagnosisId)
                 .orElseThrow(() -> new BusinessException(DiagnosisErrorCode.DIAGNOSIS_NOT_FOUND));
 
-        DifyRoadmapResponse response = parse(rawDifyJson);
+        DifyWorkflowResponseDto response = parse(rawDifyJson);
 
         for (RoadmapItemDto item : response.getRoadmapItems()) {
             Recommendation recommendation = saveRecommendation(diagnosis, item);
@@ -79,7 +79,7 @@ public class DiagnosisResultService {
         diagnosis.complete();
     }
 
-    private DifyRoadmapResponse parse(
+    private DifyWorkflowResponseDto parse(
             String rawDifyJson
     ) {
         try {

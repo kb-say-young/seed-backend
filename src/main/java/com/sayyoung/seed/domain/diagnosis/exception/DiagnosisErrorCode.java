@@ -43,6 +43,27 @@ public enum DiagnosisErrorCode implements ErrorResponseCode {
             HttpStatus.NOT_FOUND,
             "DIAGNOSIS_404_003",
             "일치하는 사용자 목표를 찾을 수 없습니다."
+    ),
+
+    /**
+     * Dify 요청 데이터 직렬화에 실패한 경우 발생합니다.
+     */
+    DIFY_REQUEST_SERIALIZATION_FAILED(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "DIAGNOSIS_500_001",
+            "Dify 요청 데이터 변환에 실패했습니다."
+    ),
+
+    DIFY_RESPONSE_EMPTY(
+            HttpStatus.BAD_GATEWAY,
+            "DIAGNOSIS_502_001",
+            "Dify 응답이 비어 있습니다."
+    ),
+
+    DIFY_API_CALL_FAILED(
+            HttpStatus.BAD_GATEWAY,
+            "DIAGNOSIS_502_002",
+            "Dify API 호출에 실패했습니다."
     );
 
     private final HttpStatus httpStatus;

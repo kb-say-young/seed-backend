@@ -2,7 +2,7 @@ package com.sayyoung.seed.global.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sayyoung.seed.domain.diagnosis.dto.DifyRoadmapResponse;
+import com.sayyoung.seed.domain.diagnosis.dto.response.DifyWorkflowResponseDto;
 
 /**
  * Dify 워크플로우가 반환한 로드맵 응답 JSON을 파싱합니다.
@@ -25,9 +25,9 @@ public final class DifyResponseParser {
      * @return 파싱된 로드맵 응답
      * @throws DifyResponseParseException JSON 형식이 올바르지 않거나 스키마와 다른 경우
      */
-    public static DifyRoadmapResponse parse(String rawJson) {
+    public static DifyWorkflowResponseDto parse(String rawJson) {
         try {
-            return OBJECT_MAPPER.readValue(rawJson, DifyRoadmapResponse.class);
+            return OBJECT_MAPPER.readValue(rawJson, DifyWorkflowResponseDto.class);
         } catch (JsonProcessingException e) {
             throw new DifyResponseParseException("Dify 응답 JSON 파싱에 실패했습니다.", e);
         }

@@ -1,6 +1,6 @@
 package com.sayyoung.seed.global.utils;
 
-import com.sayyoung.seed.domain.diagnosis.dto.DifyRoadmapResponse;
+import com.sayyoung.seed.domain.diagnosis.dto.response.DifyWorkflowResponseDto;
 import com.sayyoung.seed.domain.diagnosis.dto.RoadmapItemDto;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +43,7 @@ class DifyResponseParserTest {
                 """;
 
         // when
-        DifyRoadmapResponse response = DifyResponseParser.parse(json);
+        DifyWorkflowResponseDto response = DifyResponseParser.parse(json);
 
         // then
         assertThat(response.getRoadmapItems()).hasSize(1);
