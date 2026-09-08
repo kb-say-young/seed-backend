@@ -70,8 +70,13 @@ public class DiagnosisResultService {
                 .orElseThrow(() -> new BusinessException(DiagnosisErrorCode.DIAGNOSIS_NOT_FOUND));
 
         DifyWorkflowResponseDto response = parse(rawDifyJson);
+        List<RoadmapItemDto> roadmapItems = response.getRoadmapItems();
 
-        for (RoadmapItemDto item : response.getRoadmapItems()) {
+        if (roadmapItems == null) {
+            throw new BusinessException(DiagnosisErrorCode.INVALID_LLM_RESPONSE);
+        }
+
+        for (RoadmapItemDto item : roadmapItems) {
             Recommendation recommendation = saveRecommendation(diagnosis, item);
             saveChecklistItems(recommendation, item.getChecklist());
         }

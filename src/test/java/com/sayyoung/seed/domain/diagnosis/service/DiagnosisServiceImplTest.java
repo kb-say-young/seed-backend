@@ -191,23 +191,30 @@ class DiagnosisServiceImplTest {
     private String rawDifyResponse(String itemKey) {
         return """
                 {
-                  "roadmap_items": [
-                    {
-                      "item_key": "%s",
-                      "origin_sub_category": "%s",
-                      "order_no": 1,
-                      "start_offset": { "value": 0, "unit": "week" },
-                      "duration": { "value": 1, "unit": "month" },
-                      "title": "테스트 추천 항목",
-                      "content": "테스트 상세 내용",
-                      "target_amount": 100000,
-                      "amount_type": "saving",
-                      "target_condition": null,
-                      "next_action": "테스트 다음 행동",
-                      "citation": null,
-                      "checklist": []
+                  "data": {
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": [
+                          {
+                            "item_key": "%s",
+                            "origin_sub_category": "%s",
+                            "order_no": 1,
+                            "start_offset": { "value": 0, "unit": "week" },
+                            "duration": { "value": 1, "unit": "month" },
+                            "title": "테스트 추천 항목",
+                            "content": "테스트 상세 내용",
+                            "target_amount": 100000,
+                            "amount_type": "saving",
+                            "target_condition": null,
+                            "next_action": "테스트 다음 행동",
+                            "citation": null,
+                            "checklist": []
+                          }
+                        ]
+                      }
                     }
-                  ]
+                  }
                 }
                 """.formatted(itemKey, CATEGORY_CODE);
     }

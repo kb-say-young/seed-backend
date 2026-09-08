@@ -15,30 +15,37 @@ class DifyResponseParserTest {
         // given
         String json = """
                 {
-                  "roadmap_items": [
-                    {
-                      "item_key": "housing_rent_saving",
-                      "origin_sub_category": "월세",
-                      "order_no": 1,
-                      "start_offset": { "value": 0, "unit": "week" },
-                      "duration": { "value": 3, "unit": "month" },
-                      "title": "월세 적립 계획 수립",
-                      "content": "매월 소득의 일부를 월세 적립 계좌에 자동이체하도록 설정합니다.",
-                      "target_amount": 1500000,
-                      "amount_type": "saving",
-                      "target_condition": null,
-                      "next_action": "적립 전용 계좌를 개설하고 자동이체를 등록하세요.",
-                      "citation": null,
-                      "checklist": [
-                        {
-                          "item_key": "open_saving_account",
-                          "content": "월세 적립 전용 계좌 개설",
-                          "amount_type": null,
-                          "estimated_amount": null
-                        }
-                      ]
+                  "data": {
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": [
+                          {
+                            "item_key": "housing_rent_saving",
+                            "origin_sub_category": "월세",
+                            "order_no": 1,
+                            "start_offset": { "value": 0, "unit": "week" },
+                            "duration": { "value": 3, "unit": "month" },
+                            "title": "월세 적립 계획 수립",
+                            "content": "매월 소득의 일부를 월세 적립 계좌에 자동이체하도록 설정합니다.",
+                            "target_amount": 1500000,
+                            "amount_type": "saving",
+                            "target_condition": null,
+                            "next_action": "적립 전용 계좌를 개설하고 자동이체를 등록하세요.",
+                            "citation": null,
+                            "checklist": [
+                              {
+                                "item_key": "open_saving_account",
+                                "content": "월세 적립 전용 계좌 개설",
+                                "amount_type": null,
+                                "estimated_amount": null
+                              }
+                            ]
+                          }
+                        ]
+                      }
                     }
-                  ]
+                  }
                 }
                 """;
 

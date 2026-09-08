@@ -53,25 +53,32 @@ class DiagnosisResultServiceTest {
         String checklistKey = "apply_test_" + UUID.randomUUID();
         String rawJson = """
                 {
-                  "roadmap_items": [
-                    {
-                      "item_key": "%s",
-                      "origin_sub_category": "23",
-                      "order_no": 2,
-                      "start_offset": { "value": 1, "unit": "month" },
-                      "duration": { "value": 2, "unit": "month" },
-                      "title": "테스트 추천 항목",
-                      "content": "테스트 상세 내용",
-                      "target_amount": 500000,
-                      "amount_type": "expense",
-                      "target_condition": null,
-                      "next_action": "테스트 다음 행동",
-                      "citation": null,
-                      "checklist": [
-                        { "item_key": "%s", "content": "테스트 체크리스트", "amount_type": "expense", "estimated_amount": 200000 }
-                      ]
+                  "data": {
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": [
+                          {
+                            "item_key": "%s",
+                            "origin_sub_category": "23",
+                            "order_no": 2,
+                            "start_offset": { "value": 1, "unit": "month" },
+                            "duration": { "value": 2, "unit": "month" },
+                            "title": "테스트 추천 항목",
+                            "content": "테스트 상세 내용",
+                            "target_amount": 500000,
+                            "amount_type": "expense",
+                            "target_condition": null,
+                            "next_action": "테스트 다음 행동",
+                            "citation": null,
+                            "checklist": [
+                              { "item_key": "%s", "content": "테스트 체크리스트", "amount_type": "expense", "estimated_amount": 200000 }
+                            ]
+                          }
+                        ]
+                      }
                     }
-                  ]
+                  }
                 }
                 """.formatted(itemKey, checklistKey);
 
@@ -106,23 +113,30 @@ class DiagnosisResultServiceTest {
         Diagnosis diagnosis = diagnosisRepository.save(Diagnosis.create(user));
         String rawJson = """
                 {
-                  "roadmap_items": [
-                    {
-                      "item_key": "unknown_category_item",
-                      "origin_sub_category": "99",
-                      "order_no": 1,
-                      "start_offset": { "value": 0, "unit": "week" },
-                      "duration": { "value": 1, "unit": "month" },
-                      "title": "테스트",
-                      "content": "테스트",
-                      "target_amount": null,
-                      "amount_type": null,
-                      "target_condition": null,
-                      "next_action": "테스트",
-                      "citation": null,
-                      "checklist": []
+                  "data": {
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": [
+                          {
+                            "item_key": "unknown_category_item",
+                            "origin_sub_category": "99",
+                            "order_no": 1,
+                            "start_offset": { "value": 0, "unit": "week" },
+                            "duration": { "value": 1, "unit": "month" },
+                            "title": "테스트",
+                            "content": "테스트",
+                            "target_amount": null,
+                            "amount_type": null,
+                            "target_condition": null,
+                            "next_action": "테스트",
+                            "citation": null,
+                            "checklist": []
+                          }
+                        ]
+                      }
                     }
-                  ]
+                  }
                 }
                 """;
 
