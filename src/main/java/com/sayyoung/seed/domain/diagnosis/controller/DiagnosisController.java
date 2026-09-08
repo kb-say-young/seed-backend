@@ -1,6 +1,7 @@
 package com.sayyoung.seed.domain.diagnosis.controller;
 
 import com.sayyoung.seed.domain.diagnosis.dto.request.DiagnosisRequestDto;
+import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisStatusResponse;
 import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisSummaryResponse;
 import com.sayyoung.seed.domain.diagnosis.service.DiagnosisService;
 import com.sayyoung.seed.domain.diagnosis.service.DiagnosisSummaryService;
@@ -55,15 +56,18 @@ public class DiagnosisController {
                 .build();
     }
 
-//    /**
-//     * 저장된 진단 결과를 조회한다.
-//     */
-//    @GetMapping("/{diagnosisId}")
-//    public ResponseEntity getDiagnosis(
-//            @PathVariable Long diagnosisId
-//    ) {
-//
-//    }
+    /**
+     * 저장된 진단 결과를 조회한다.
+     */
+    @GetMapping("/{diagnosisId}")
+    public ResponseEntity<ApiResponse<DiagnosisStatusResponse>> getDiagnosis(
+            @PathVariable Long diagnosisId
+    ) {
+        DiagnosisStatusResponse response = diagnosisService.getDiagnosis(diagnosisId);
+
+        return ResponseFactory
+                .success(SuccessCode.COMMON_OK, response);
+    }
 
     /**
      * 로드맵 화면 상단에 노출할 진단 요약 정보를 조회한다.

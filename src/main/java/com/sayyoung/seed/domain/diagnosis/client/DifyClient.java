@@ -1,7 +1,6 @@
 package com.sayyoung.seed.domain.diagnosis.client;
 
 import com.sayyoung.seed.domain.diagnosis.dto.request.DifyWorkflowRequestDto;
-import com.sayyoung.seed.domain.diagnosis.dto.response.DifyWorkflowResponseDto;
 import com.sayyoung.seed.domain.diagnosis.exception.DiagnosisErrorCode;
 import com.sayyoung.seed.global.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,18 +24,18 @@ public class DifyClient {
     }
 
     /**
-     * Dify Workflow를 실행한다.
+     * Dify Workflow를 실행하고 원본 응답 JSON 문자열을 반환한다.
      */
-    public DifyWorkflowResponseDto run(DifyWorkflowRequestDto requestDto) {
+    public String run(DifyWorkflowRequestDto requestDto) {
         try {
-            DifyWorkflowResponseDto response = difyRestClient
+            String response = difyRestClient
                     .post()
                     .uri(WORKFLOW_PATH)
                     .body(requestDto)
                     .retrieve()
-                    .body(DifyWorkflowResponseDto.class);
+                    .body(String.class);
 
-            if (response == null) {
+            if (response == null || response.isBlank()) {
                 throw new BusinessException(DiagnosisErrorCode.DIFY_RESPONSE_EMPTY);
             }
 

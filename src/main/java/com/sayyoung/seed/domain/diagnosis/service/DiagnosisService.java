@@ -1,6 +1,7 @@
 package com.sayyoung.seed.domain.diagnosis.service;
 
 import com.sayyoung.seed.domain.diagnosis.dto.request.DiagnosisRequestDto;
+import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisStatusResponse;
 
 /**
  * 진단 생성과 결과 조회 기능을 제공하는 서비스 인터페이스.
@@ -17,5 +18,8 @@ public interface DiagnosisService {
             DiagnosisRequestDto requestDto
     );
 
-
+    /**
+     * 진단의 현재 상태를 조회한다.
+     */
+    DiagnosisStatusResponse getDiagnosis(Long diagnosisId);
 }
