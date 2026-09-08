@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -272,7 +273,7 @@ class DiagnosisSummaryServiceTest {
 
         // given
         String loginId = "rm_" + UUID.randomUUID().toString().substring(0, 8);
-        User user = userRepository.save(User.create(loginId, "테스트", "20000101", "01000000000"));
+        User user = userRepository.save(User.create(loginId, "테스트", LocalDate.of(2000, 1, 1), "01000000000", "대학재학"));
 
         try {
             // when & then

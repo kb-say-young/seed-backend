@@ -66,7 +66,8 @@ public class UserService {
                 request.getLoginId(),
                 request.getName(),
                 request.getBirthDate(),
-                request.getPhoneNumber()
+                request.getPhoneNumber(),
+                request.getEducation()
         );
         userRepository.save(user);
 
