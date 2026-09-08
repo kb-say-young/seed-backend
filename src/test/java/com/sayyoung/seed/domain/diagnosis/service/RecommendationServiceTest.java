@@ -4,9 +4,15 @@ import com.sayyoung.seed.domain.diagnosis.dto.request.RecommendationCategory;
 import com.sayyoung.seed.domain.diagnosis.dto.response.RecommendationDetailResponse;
 import com.sayyoung.seed.domain.diagnosis.dto.response.RecommendationResponse;
 import com.sayyoung.seed.domain.diagnosis.entity.Diagnosis;
+import com.sayyoung.seed.domain.diagnosis.entity.Recommendation;
 import com.sayyoung.seed.domain.diagnosis.exception.DiagnosisErrorCode;
 import com.sayyoung.seed.domain.diagnosis.repository.DiagnosisRepository;
+import com.sayyoung.seed.domain.diagnosis.repository.RecommendationRepository;
+import com.sayyoung.seed.domain.policy.entity.Category;
+import com.sayyoung.seed.domain.policy.repository.CategoryRepository;
 import com.sayyoung.seed.domain.user.entity.User;
+import com.sayyoung.seed.domain.user.entity.UserGoal;
+import com.sayyoung.seed.domain.user.repository.UserGoalRepository;
 import com.sayyoung.seed.domain.user.repository.UserRepository;
 import com.sayyoung.seed.global.exception.BusinessException;
 import com.sayyoung.seed.global.response.code.CommonErrorCode;
@@ -42,6 +48,15 @@ class RecommendationServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RecommendationRepository recommendationRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private UserGoalRepository userGoalRepository;
+
     @Test
     void 카테고리_필터가_없으면_해당_진단의_전체_추천_목록을_조회한다() {
 
@@ -68,6 +83,18 @@ class RecommendationServiceTest {
         assertThat(responses).hasSize(1);
         assertThat(responses.get(0).getTitle()).isEqualTo("월세 적립 계획 수립");
         assertThat(responses.get(0).getCategory()).isEqualTo("월세");
+    }
+
+    @Test
+    void 목록_조회_시_체크리스트_완료_여부로_상태가_파생된다() {
+
+        // when
+        List<RecommendationResponse> responses = recommendationService.getRecommendations(SEEDED_DIAGNOSIS_ID, null);
+
+        // then: 두 추천 모두 체크리스트가 있지만 전부 완료되지는 않아 진행 중(progress)이다.
+        assertThat(responses)
+                .extracting(RecommendationResponse::getStatus)
+                .containsOnly("progress");
     }
 
     @Test
@@ -116,6 +143,41 @@ class RecommendationServiceTest {
         assertThat(response.getChecklistItems())
                 .extracting("status")
                 .containsExactly("done", "todo");
+
+        // 체크리스트 2건 중 1건만 완료되어 상태는 진행 중(progress)이다.
+        assertThat(response.getStatus()).isEqualTo("progress");
+    }
+
+    @Test
+    void 체크리스트가_없는_추천_항목은_확인_필요_상태로_파생된다() {
+
+        // given: 시드 데이터의 카테고리/목표/진단을 재사용해 체크리스트가 없는 추천 항목을 새로 만든다.
+        Category category = categoryRepository.findById("12").orElseThrow();
+        UserGoal goal = userGoalRepository.findById(1L).orElseThrow();
+        Diagnosis diagnosis = diagnosisRepository.findById(SEEDED_DIAGNOSIS_ID).orElseThrow();
+
+        Recommendation recommendation = recommendationRepository.save(Recommendation.create(
+                category, goal, diagnosis,
+                "test_no_checklist_item", 99,
+                0, "week", 1, "month",
+                "테스트 추천 항목", "테스트 내용",
+                null, null, null,
+                "테스트 다음 행동", null
+        ));
+
+        try {
+            // when
+            RecommendationDetailResponse response = recommendationService.getRecommendationDetail(
+                    SEEDED_USER_ID,
+                    recommendation.getId()
+            );
+
+            // then
+            assertThat(response.getChecklistItems()).isEmpty();
+            assertThat(response.getStatus()).isEqualTo("review");
+        } finally {
+            recommendationRepository.deleteById(recommendation.getId());
+        }
     }
 
     @Test

@@ -47,20 +47,29 @@ public class RecommendationResponse {
     private final String nextAction;
 
     /**
+     * 하위 체크리스트 완료 여부로 파생한 상태입니다.
+     */
+    @Schema(description = "상태 (done: 완료, review: 확인 필요, progress: 진행 중)", example = "progress")
+    private final String status;
+
+    /**
      * Recommendation 엔티티를 로드맵 응답 DTO로 변환합니다.
      *
      * @param recommendation 변환할 추천 엔티티
+     * @param status         하위 체크리스트로부터 파생한 상태
      * @return 변환된 로드맵 응답 DTO
      */
     public static RecommendationResponse from(
-            Recommendation recommendation
+            Recommendation recommendation,
+            String status
     ) {
         return new RecommendationResponse(
                 recommendation.getId(),
                 recommendation.getTitle(),
                 recommendation.getCategory().getName(),
                 recommendation.getTargetAmount(),
-                recommendation.getNextAction()
+                recommendation.getNextAction(),
+                status
         );
     }
 }

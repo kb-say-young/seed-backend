@@ -64,15 +64,23 @@ public class RecommendationDetailResponse {
     private final List<ChecklistItemResponse> checklistItems;
 
     /**
+     * 하위 체크리스트 완료 여부로 파생한 상태입니다.
+     */
+    @Schema(description = "상태 (done: 완료, review: 확인 필요, progress: 진행 중)", example = "progress")
+    private final String status;
+
+    /**
      * Recommendation 엔티티와 체크리스트 항목 목록을 로드맵 상세 응답 DTO로 변환합니다.
      *
      * @param recommendation 변환할 추천(로드맵) 엔티티
      * @param checklistItems 추천 항목에 속한 체크리스트 항목 목록
+     * @param status         하위 체크리스트로부터 파생한 상태
      * @return 변환된 로드맵 상세 응답 DTO
      */
     public static RecommendationDetailResponse from(
             Recommendation recommendation,
-            List<ChecklistItem> checklistItems
+            List<ChecklistItem> checklistItems,
+            String status
     ) {
         return new RecommendationDetailResponse(
                 recommendation.getId(),
@@ -91,7 +99,8 @@ public class RecommendationDetailResponse {
                 recommendation.getCitation(),
                 checklistItems.stream()
                         .map(ChecklistItemResponse::from)
-                        .toList()
+                        .toList(),
+                status
         );
     }
 }

@@ -63,7 +63,8 @@ class RecommendationControllerTest {
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.checklistItems.length()").value(2));
+                .andExpect(jsonPath("$.data.checklistItems.length()").value(2))
+                .andExpect(jsonPath("$.data.status").value("progress"));
     }
 
     @Test
