@@ -28,6 +28,7 @@ public class DiagnosisSummaryService {
 
     private static final String WEEK_UNIT = "week";
     private static final int WEEKS_PER_MONTH = 4;
+    private static final String SAVING_AMOUNT_TYPE = "saving";
 
     private final DiagnosisRepository diagnosisRepository;
     private final RecommendationRepository recommendationRepository;
@@ -49,7 +50,10 @@ public class DiagnosisSummaryService {
         int targetMonths = calculateTargetMonths(recommendations);
         int elapsedMonths = calculateElapsedMonths(diagnosis);
         int remainingMonths = Math.max(0, targetMonths - elapsedMonths);
-        BigDecimal monthlyTargetSaving = calculateMonthlyTargetSaving(diagnosis, recommendations, remainingMonths);
+        BigDecimal fixedBudget = diagnosis.getUser().getFixedBudget() != null
+                ? diagnosis.getUser().getFixedBudget()
+                : BigDecimal.ZERO;
+        BigDecimal monthlyTargetSaving = calculateMonthlyTargetSaving(fixedBudget, recommendations, remainingMonths);
 
         return DiagnosisSummaryResponse.of(
                 targetMonths,
@@ -77,7 +81,7 @@ public class DiagnosisSummaryService {
             Integer value,
             String unit
     ) {
-        if (WEEK_UNIT.equals(unit)) {
+        if (WEEK_UNIT.equalsIgnoreCase(unit)) {
             return (int) Math.ceil(value / (double) WEEKS_PER_MONTH);
         }
         return value;
@@ -92,8 +96,14 @@ public class DiagnosisSummaryService {
         return (int) ChronoUnit.MONTHS.between(diagnosis.getCreatedAt().toLocalDate(), LocalDate.now());
     }
 
+    /**
+     * 누적액은 diagnosis별 저축 진행률이 아니라 users.fixed_budget(디딤씨앗통장 잔액) 값을
+     * 그대로 사용하는 임시 방편이다. 사용자당 하나뿐이라 여러 진단에 동일한 값이 반영되고,
+     * 체크리스트 완료 등 실제 진행 상황과는 연동되지 않는다. 진단별 누적액 추적은 별도
+     * 예산 기능 이슈에서 다룬다.
+     */
     private BigDecimal calculateMonthlyTargetSaving(
-            Diagnosis diagnosis,
+            BigDecimal fixedBudget,
             List<Recommendation> recommendations,
             int remainingMonths
     ) {
@@ -102,15 +112,13 @@ public class DiagnosisSummaryService {
         }
 
         BigDecimal totalTargetAmount = recommendations.stream()
+                .filter(recommendation -> SAVING_AMOUNT_TYPE.equals(recommendation.getAmountType()))
                 .map(Recommendation::getTargetAmount)
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal accumulatedAmount = diagnosis.getUser().getFixedBudget() != null
-                ? diagnosis.getUser().getFixedBudget()
-                : BigDecimal.ZERO;
+        BigDecimal remainingAmount = totalTargetAmount.subtract(fixedBudget).max(BigDecimal.ZERO);
 
-        return totalTargetAmount.subtract(accumulatedAmount)
-                .divide(BigDecimal.valueOf(remainingMonths), 0, RoundingMode.CEILING);
+        return remainingAmount.divide(BigDecimal.valueOf(remainingMonths), 0, RoundingMode.CEILING);
     }
 }
