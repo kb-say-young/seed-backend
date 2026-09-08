@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * 사용자 AI 진단 이력을 나타내는 엔티티입니다.
  */
@@ -31,8 +33,8 @@ public class Diagnosis {
     @Column(name = "status", nullable = false, length = 20)
     private String status;
 
-    @Column(name = "summary", columnDefinition = "TEXT")
-    private String summary;
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     private Diagnosis(
             User user,

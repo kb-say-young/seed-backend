@@ -1,7 +1,12 @@
 package com.sayyoung.seed.domain.diagnosis.controller;
 
 import com.sayyoung.seed.domain.diagnosis.dto.request.DiagnosisRequestDto;
+import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisSummaryResponse;
 import com.sayyoung.seed.domain.diagnosis.service.DiagnosisService;
+import com.sayyoung.seed.domain.diagnosis.service.DiagnosisSummaryService;
+import com.sayyoung.seed.global.response.ApiResponse;
+import com.sayyoung.seed.global.response.ResponseFactory;
+import com.sayyoung.seed.global.response.code.SuccessCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +25,7 @@ import java.net.URI;
 public class DiagnosisController {
 
     private final DiagnosisService diagnosisService;
+    private final DiagnosisSummaryService diagnosisSummaryService;
 
     /**
      * AI 진단을 수행하고 결과 조회 URI로 리다이렉트한다.
@@ -58,4 +64,17 @@ public class DiagnosisController {
 //    ) {
 //
 //    }
+
+    /**
+     * 로드맵 화면 상단에 노출할 진단 요약 정보를 조회한다.
+     */
+    @GetMapping("/{diagnosisId}/summary")
+    public ResponseEntity<ApiResponse<DiagnosisSummaryResponse>> getSummary(
+            @PathVariable Long diagnosisId
+    ) {
+        DiagnosisSummaryResponse response = diagnosisSummaryService.getSummary(diagnosisId);
+
+        return ResponseFactory
+                .success(SuccessCode.COMMON_OK, response);
+    }
 }
