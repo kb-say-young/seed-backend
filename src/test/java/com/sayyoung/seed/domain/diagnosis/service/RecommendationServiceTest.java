@@ -1,6 +1,7 @@
 package com.sayyoung.seed.domain.diagnosis.service;
 
 import com.sayyoung.seed.domain.diagnosis.dto.request.RecommendationCategory;
+import com.sayyoung.seed.domain.diagnosis.dto.response.RecommendationDetailResponse;
 import com.sayyoung.seed.domain.diagnosis.dto.response.RecommendationResponse;
 import com.sayyoung.seed.domain.diagnosis.entity.Diagnosis;
 import com.sayyoung.seed.domain.diagnosis.exception.DiagnosisErrorCode;
@@ -8,6 +9,7 @@ import com.sayyoung.seed.domain.diagnosis.repository.DiagnosisRepository;
 import com.sayyoung.seed.domain.user.entity.User;
 import com.sayyoung.seed.domain.user.repository.UserRepository;
 import com.sayyoung.seed.global.exception.BusinessException;
+import com.sayyoung.seed.global.response.code.CommonErrorCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,8 +27,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RecommendationServiceTest {
 
     private static final Long SEEDED_USER_ID = 1L;
+    private static final Long OTHER_USER_ID = 2L;
     private static final Long SEEDED_DIAGNOSIS_ID = 1L;
+    private static final Long SEEDED_RECOMMENDATION_ID = 1L;
     private static final Long NOT_EXISTING_DIAGNOSIS_ID = 999_999L;
+    private static final Long NOT_EXISTING_RECOMMENDATION_ID = 999_999L;
 
     @Autowired
     private RecommendationService recommendationService;
@@ -91,5 +96,51 @@ class RecommendationServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .extracting(e -> ((BusinessException) e).getErrorCode())
                 .isEqualTo(DiagnosisErrorCode.DIAGNOSIS_NOT_FOUND);
+    }
+
+    @Test
+    void 추천_항목_식별자로_상세를_조회한다() {
+
+        // when
+        RecommendationDetailResponse response = recommendationService.getRecommendationDetail(
+                SEEDED_USER_ID,
+                SEEDED_RECOMMENDATION_ID
+        );
+
+        // then
+        assertThat(response.getRecommendationId()).isEqualTo(SEEDED_RECOMMENDATION_ID);
+        assertThat(response.getTitle()).isEqualTo("월세 적립 계획 수립");
+        assertThat(response.getNextAction()).isEqualTo("적립 전용 계좌를 개설하고 자동이체를 등록하세요.");
+
+        assertThat(response.getChecklistItems()).hasSize(2);
+        assertThat(response.getChecklistItems())
+                .extracting("status")
+                .containsExactly("done", "todo");
+    }
+
+    @Test
+    void 존재하지_않는_추천_항목이면_예외를_던진다() {
+
+        // when & then
+        assertThatThrownBy(() -> recommendationService.getRecommendationDetail(
+                SEEDED_USER_ID,
+                NOT_EXISTING_RECOMMENDATION_ID
+        ))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(DiagnosisErrorCode.RECOMMENDATION_NOT_FOUND);
+    }
+
+    @Test
+    void 다른_사용자의_추천_항목을_조회하면_예외를_던진다() {
+
+        // when & then
+        assertThatThrownBy(() -> recommendationService.getRecommendationDetail(
+                OTHER_USER_ID,
+                SEEDED_RECOMMENDATION_ID
+        ))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(CommonErrorCode.FORBIDDEN);
     }
 }

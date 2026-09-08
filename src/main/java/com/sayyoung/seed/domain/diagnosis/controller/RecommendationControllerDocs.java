@@ -1,6 +1,7 @@
 package com.sayyoung.seed.domain.diagnosis.controller;
 
 import com.sayyoung.seed.domain.diagnosis.dto.request.RecommendationCategory;
+import com.sayyoung.seed.domain.diagnosis.dto.response.RecommendationDetailResponse;
 import com.sayyoung.seed.domain.diagnosis.dto.response.RecommendationResponse;
 import com.sayyoung.seed.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 
@@ -66,5 +68,51 @@ public interface RecommendationControllerDocs {
                             + "전달하지 않으면 전체 조회합니다."
             )
             RecommendationCategory category
+    );
+
+    /**
+     * 추천(로드맵) 항목 상세 및 체크리스트 목록 조회 API 명세입니다.
+     *
+     * @param recommendationId 조회할 추천 항목 식별자
+     * @return 공통 응답 형식으로 감싼 로드맵 상세
+     */
+    @Operation(
+            summary = "로드맵(추천) 항목 상세 조회",
+            description = "인증된 사용자 본인 소유의 추천 항목 식별자를 기준으로 로드맵 항목 상세와 하위 체크리스트 목록을 조회합니다. "
+                    + "Authorization 헤더에 유효한 액세스 토큰이 필요합니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "로드맵(추천) 항목 상세 조회 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증되지 않은 요청"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "다른 사용자 소유의 추천 항목에 접근"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "존재하지 않는 추천 항목 식별자"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "500",
+                    description = "서버 내부 오류"
+            )
+    })
+    ResponseEntity<ApiResponse<RecommendationDetailResponse>> getRecommendationDetail(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal Long userId,
+
+            @Parameter(
+                    name = "recommendationId",
+                    description = "조회할 추천 항목 식별자",
+                    example = "1",
+                    required = true
+            )
+            Long recommendationId
     );
 }
