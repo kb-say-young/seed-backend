@@ -1,8 +1,6 @@
 package com.sayyoung.seed.domain.diagnosis.service;
 
-import java.time.LocalDate;
 import com.sayyoung.seed.domain.diagnosis.client.DifyClient;
-import com.sayyoung.seed.domain.diagnosis.dto.request.DiagnosisRequestDto;
 import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisStatusResponse;
 import com.sayyoung.seed.domain.diagnosis.entity.ChecklistItem;
 import com.sayyoung.seed.domain.diagnosis.entity.Diagnosis;
@@ -13,6 +11,7 @@ import com.sayyoung.seed.domain.diagnosis.repository.DiagnosisRepository;
 import com.sayyoung.seed.domain.diagnosis.repository.RecommendationRepository;
 import com.sayyoung.seed.domain.policy.entity.Category;
 import com.sayyoung.seed.domain.policy.repository.CategoryRepository;
+import com.sayyoung.seed.domain.user.dto.request.IntakeRequest;
 import com.sayyoung.seed.domain.user.entity.User;
 import com.sayyoung.seed.domain.user.entity.UserGoal;
 import com.sayyoung.seed.domain.user.repository.UserGoalRepository;
@@ -24,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -160,7 +160,7 @@ class DiagnosisServiceImplTest {
         return categoryRepository.findById(CATEGORY_CODE).orElseThrow();
     }
 
-    private DiagnosisRequestDto requestDto() {
+    private IntakeRequest requestDto() {
         String json = """
                 {
                   "user_profile": {
@@ -185,7 +185,7 @@ class DiagnosisServiceImplTest {
                 }
                 """.formatted(CATEGORY_CODE);
 
-        return objectMapper.readValue(json, DiagnosisRequestDto.class);
+        return objectMapper.readValue(json, IntakeRequest.class);
     }
 
     private String rawDifyResponse(String itemKey) {

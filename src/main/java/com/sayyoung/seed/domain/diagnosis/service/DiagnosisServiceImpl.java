@@ -1,13 +1,13 @@
 package com.sayyoung.seed.domain.diagnosis.service;
 
 import com.sayyoung.seed.domain.diagnosis.client.DifyClient;
-import com.sayyoung.seed.domain.diagnosis.dto.request.DiagnosisRequestDto;
 import com.sayyoung.seed.domain.diagnosis.dto.request.DifyWorkflowRequestDto;
 import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisStatusResponse;
 import com.sayyoung.seed.domain.diagnosis.entity.Diagnosis;
 import com.sayyoung.seed.domain.diagnosis.exception.DiagnosisErrorCode;
 import com.sayyoung.seed.domain.diagnosis.mapper.DifyWorkflowMapper;
 import com.sayyoung.seed.domain.diagnosis.repository.DiagnosisRepository;
+import com.sayyoung.seed.domain.user.dto.request.IntakeRequest;
 import com.sayyoung.seed.domain.user.entity.User;
 import com.sayyoung.seed.domain.user.repository.UserRepository;
 import com.sayyoung.seed.global.exception.BusinessException;
@@ -43,7 +43,7 @@ public class DiagnosisServiceImpl implements DiagnosisService {
     @Override
     public Long diagnose(
             Long userId,
-            DiagnosisRequestDto requestDto
+            IntakeRequest requestDto
     ) {
 
         // 진단 대상 사용자 조회

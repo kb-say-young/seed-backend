@@ -1,17 +1,20 @@
 package com.sayyoung.seed.domain.diagnosis.controller;
 
-import com.sayyoung.seed.domain.diagnosis.dto.request.DiagnosisRequestDto;
 import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisStatusResponse;
 import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisSummaryResponse;
 import com.sayyoung.seed.domain.diagnosis.service.DiagnosisService;
 import com.sayyoung.seed.domain.diagnosis.service.DiagnosisSummaryService;
+import com.sayyoung.seed.domain.user.dto.request.IntakeRequest;
+import com.sayyoung.seed.global.exception.BusinessException;
 import com.sayyoung.seed.global.response.ApiResponse;
 import com.sayyoung.seed.global.response.ResponseFactory;
+import com.sayyoung.seed.global.response.code.CommonErrorCode;
 import com.sayyoung.seed.global.response.code.SuccessCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -33,9 +36,13 @@ public class DiagnosisController {
      */
     @PostMapping
     public ResponseEntity<Void> diagnose(
-            @RequestParam Long userId,
-            @Valid @RequestBody DiagnosisRequestDto requestDto
+            @AuthenticationPrincipal Long userId,
+            @Valid @RequestBody IntakeRequest requestDto
     ) {
+        if (userId == null) {
+            throw new BusinessException(CommonErrorCode.UNAUTHORIZED);
+        }
+
         // 진단 수행 후 저장된 진단 ID 반환
         Long diagnosisId = diagnosisService.diagnose(
                 userId,
