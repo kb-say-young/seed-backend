@@ -1,5 +1,6 @@
 package com.sayyoung.seed.domain.diagnosis.service;
 
+import com.sayyoung.seed.domain.diagnosis.dto.request.ChecklistItemCompleteRequest;
 import com.sayyoung.seed.domain.diagnosis.dto.request.RecommendationCategory;
 import com.sayyoung.seed.domain.diagnosis.dto.response.RecommendationDetailResponse;
 import com.sayyoung.seed.domain.diagnosis.dto.response.RecommendationResponse;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 로드맵(추천) 조회와 관련된 비즈니스 로직을 처리하는 서비스입니다.
@@ -24,6 +27,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RecommendationService {
+
+    private static final String STATUS_DONE = "done";
+    private static final String STATUS_REVIEW = "review";
+    private static final String STATUS_PROGRESS = "progress";
 
     private final DiagnosisRepository diagnosisRepository;
     private final RecommendationRepository recommendationRepository;
@@ -53,8 +60,20 @@ public class RecommendationService {
                         category.getTopLevelCategoryName()
                 );
 
+        List<Long> recommendationIds = recommendations.stream()
+                .map(Recommendation::getId)
+                .toList();
+
+        Map<Long, List<ChecklistItem>> checklistItemsByRecommendationId = checklistItemRepository
+                .findByRecommendationIdIn(recommendationIds)
+                .stream()
+                .collect(Collectors.groupingBy(item -> item.getRecommendation().getId()));
+
         return recommendations.stream()
-                .map(RecommendationResponse::from)
+                .map(recommendation -> RecommendationResponse.from(
+                        recommendation,
+                        deriveStatus(checklistItemsByRecommendationId.getOrDefault(recommendation.getId(), List.of()))
+                ))
                 .toList();
     }
 
@@ -81,6 +100,48 @@ public class RecommendationService {
         List<ChecklistItem> checklistItems = checklistItemRepository
                 .findByRecommendationIdOrderByOrderNoAsc(recommendationId);
 
-        return RecommendationDetailResponse.from(recommendation, checklistItems);
+        return RecommendationDetailResponse.from(recommendation, checklistItems, deriveStatus(checklistItems));
+    }
+
+    /**
+     * 하위 체크리스트 항목들의 완료 여부로 추천(로드맵) 항목의 상태를 파생시킵니다.
+     * 체크리스트가 없으면 확인 필요(review), 전부 완료되었으면 완료(done), 그 외에는 진행 중(progress)입니다.
+     *
+     * @param checklistItems 상태를 파생시킬 체크리스트 항목 목록
+     * @return 파생된 상태 문자열
+     */
+    private String deriveStatus(List<ChecklistItem> checklistItems) {
+        if (checklistItems.isEmpty()) {
+            return STATUS_REVIEW;
+        }
+
+        return checklistItems.stream().allMatch(ChecklistItem::isDone)
+                ? STATUS_DONE
+                : STATUS_PROGRESS;
+    }
+
+    /**
+     * 체크리스트 항목을 완료 처리합니다.
+     *
+     * @param userId           완료를 요청한 사용자 식별자
+     * @param checklistItemId  완료 처리할 체크리스트 항목 식별자
+     * @param request          완료 요청 정보(비용/일자는 계약 형태 호환을 위해서만 받으며 아직 저장하지 않음)
+     * @throws BusinessException 존재하지 않는 체크리스트 항목이거나, 다른 사용자 소유인 경우
+     */
+    @Transactional
+    public void completeChecklistItem(
+            Long userId,
+            Long checklistItemId,
+            ChecklistItemCompleteRequest request
+    ) {
+        ChecklistItem checklistItem = checklistItemRepository.findById(checklistItemId)
+                .orElseThrow(() -> new BusinessException(DiagnosisErrorCode.CHECKLIST_ITEM_NOT_FOUND));
+
+        // 체크리스트 항목이 속한 추천의 소유자와 요청 사용자가 일치하는지 확인
+        if (!checklistItem.getRecommendation().getDiagnosis().getUser().getId().equals(userId)) {
+            throw new BusinessException(CommonErrorCode.FORBIDDEN);
+        }
+
+        checklistItem.complete();
     }
 }

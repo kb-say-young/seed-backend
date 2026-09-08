@@ -55,6 +55,15 @@ public enum DiagnosisErrorCode implements ErrorResponseCode {
     ),
 
     /**
+     * 요청한 체크리스트 항목이 존재하지 않는 경우 발생합니다.
+     */
+    CHECKLIST_ITEM_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "DIAGNOSIS_404_005",
+            "존재하지 않는 체크리스트 항목입니다."
+    ),
+
+    /**
      * Dify 요청 데이터 직렬화에 실패한 경우 발생합니다.
      */
     DIFY_REQUEST_SERIALIZATION_FAILED(

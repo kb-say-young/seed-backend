@@ -27,4 +27,13 @@ public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Lo
     List<ChecklistItem> findByRecommendationIdOrderByOrderNoAsc(
             Long recommendationId
     );
+
+    /**
+     * 여러 추천 항목에 속한 체크리스트 항목을 한 번에 조회합니다.
+     *
+     * @param recommendationIds 추천 항목 식별자 목록
+     */
+    List<ChecklistItem> findByRecommendationIdIn(
+            List<Long> recommendationIds
+    );
 }

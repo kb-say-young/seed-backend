@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 public class ChecklistItem {
 
     private static final String STATUS_TODO = "todo";
+    private static final String STATUS_DONE = "done";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,5 +74,20 @@ public class ChecklistItem {
             BigDecimal estimatedAmount
     ) {
         return new ChecklistItem(recommendation, itemKey, contents, orderNo, estimatedAmount, STATUS_TODO);
+    }
+
+    /**
+     * 체크리스트 항목을 완료(done) 상태로 전환하고 완료 일시를 현재 시각으로 기록합니다.
+     */
+    public void complete() {
+        this.status = STATUS_DONE;
+        this.completedAt = LocalDateTime.now();
+    }
+
+    /**
+     * 체크리스트 항목이 완료(done) 상태인지 확인합니다.
+     */
+    public boolean isDone() {
+        return STATUS_DONE.equals(this.status);
     }
 }
