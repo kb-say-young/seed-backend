@@ -46,6 +46,15 @@ public enum DiagnosisErrorCode implements ErrorResponseCode {
     ),
 
     /**
+     * 요청한 추천(로드맵) 항목이 존재하지 않는 경우 발생합니다.
+     */
+    RECOMMENDATION_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "DIAGNOSIS_404_004",
+            "존재하지 않는 로드맵 항목입니다."
+    ),
+
+    /**
      * Dify 요청 데이터 직렬화에 실패한 경우 발생합니다.
      */
     DIFY_REQUEST_SERIALIZATION_FAILED(
