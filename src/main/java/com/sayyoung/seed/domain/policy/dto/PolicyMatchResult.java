@@ -3,6 +3,8 @@ package com.sayyoung.seed.domain.policy.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 /**
  * QueryDSL 정책 필터링 결과를 담는 내부 객체.
  */
@@ -10,11 +12,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class PolicyMatchResult {
 
-    // Goal-Policy 관계 저장에 사용할 내부 PK
-    private Long policyId;
-
-    // 온통청년 정책번호
-    private String policyNo;
+    // 정책 ID
+    private Long id;
 
     // 정책명
     private String name;
@@ -24,4 +23,13 @@ public class PolicyMatchResult {
 
     // 운영 기관명
     private String institutionName;
+
+    // 신청 시작일
+    private LocalDate applyStartDate;
+
+    // 신청 종료일
+    private LocalDate applyEndDate;
+
+    // 자립준비청년 대상 여부
+    private boolean independentYouth;
 }

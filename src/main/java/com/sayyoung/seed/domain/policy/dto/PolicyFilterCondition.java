@@ -1,16 +1,18 @@
 package com.sayyoung.seed.domain.policy.dto;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
 
 /**
- * 하나의 Goal을 기준으로 정책을 조회할 때 사용하는 내부 조건 객체.
- * 프론트 요청 전체가 아니라 정책 필터링에 필요한 값만 담는다.
+ * 정책 검색 조건을 담는 내부 객체.
  */
 @Getter
-@AllArgsConstructor
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PolicyFilterCondition {
 
     // Goal의 세부 카테고리 ID
