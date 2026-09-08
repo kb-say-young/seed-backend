@@ -36,6 +36,9 @@ public class User {
     @Column(name = "phone_number", nullable = false, length = 11)
     private String phoneNumber;
 
+    @Column(name = "education", nullable = false, length = 10)
+    private String education;
+
     @Column(name = "protection_end_date")
     private LocalDate protectionEndDate;
 
@@ -67,12 +70,14 @@ public class User {
             String loginId,
             String name,
             String birthDate,
-            String phoneNumber
+            String phoneNumber,
+            String education
     ) {
         this.loginId = loginId;
         this.name = name;
         this.birthDate = birthDate;
         this.phoneNumber = phoneNumber;
+        this.education = education;
     }
 
     /**
@@ -82,15 +87,17 @@ public class User {
      * @param name        이름
      * @param birthDate   생년월일(yyyyMMdd)
      * @param phoneNumber 휴대폰 번호(하이픈 제외)
+     * @param education   학력
      * @return 생성된 사용자 엔티티
      */
     public static User create(
             String loginId,
             String name,
             String birthDate,
-            String phoneNumber
+            String phoneNumber,
+            String education
     ) {
-        return new User(loginId, name, birthDate, phoneNumber);
+        return new User(loginId, name, birthDate, phoneNumber, education);
     }
 
     /**

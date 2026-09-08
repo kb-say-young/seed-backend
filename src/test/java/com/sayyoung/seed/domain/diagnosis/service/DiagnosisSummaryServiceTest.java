@@ -272,7 +272,7 @@ class DiagnosisSummaryServiceTest {
 
         // given
         String loginId = "rm_" + UUID.randomUUID().toString().substring(0, 8);
-        User user = userRepository.save(User.create(loginId, "테스트", "20000101", "01000000000"));
+        User user = userRepository.save(User.create(loginId, "테스트", "20000101", "01000000000", "대학재학"));
 
         try {
             // when & then
