@@ -1,5 +1,6 @@
 package com.sayyoung.seed.domain.diagnosis.controller;
 
+import java.time.LocalDate;
 import com.sayyoung.seed.domain.diagnosis.client.DifyClient;
 import com.sayyoung.seed.domain.diagnosis.entity.ChecklistItem;
 import com.sayyoung.seed.domain.diagnosis.entity.Recommendation;
@@ -94,7 +95,7 @@ class DiagnosisControllerTest {
         User user = userRepository.save(User.create(
                 "diag_ctrl_" + UUID.randomUUID().toString().substring(0, 8),
                 "테스트유저",
-                "20010101",
+                LocalDate.of(2001, 1, 1),
                 "01000000000"
         ));
         userGoalRepository.save(UserGoal.create(user, categoryRepository.findById(CATEGORY_CODE).orElseThrow(), "{}"));
