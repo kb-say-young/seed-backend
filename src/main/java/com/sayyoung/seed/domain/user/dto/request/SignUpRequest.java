@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 /**
  * 회원가입 요청 DTO입니다.
  */
@@ -29,7 +31,7 @@ public class SignUpRequest {
     @Schema(description = "생년월일(yyyyMMdd)", example = "19990101")
     @NotBlank(message = "생년월일은 필수입니다.")
     @Pattern(regexp = "\\d{8}", message = "생년월일은 yyyyMMdd 형식의 숫자 8자리로 입력해주세요.")
-    private String birthDate;
+    private LocalDate birthDate;
 
     @Schema(description = "휴대폰 번호(하이픈 제외)", example = "01012345678")
     @NotBlank(message = "휴대폰 번호는 필수입니다.")

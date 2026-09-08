@@ -31,7 +31,7 @@ public class User {
     private String name;
 
     @Column(name = "birth_date", nullable = false, length = 8)
-    private String birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "phone_number", nullable = false, length = 11)
     private String phoneNumber;
@@ -66,7 +66,7 @@ public class User {
     private User(
             String loginId,
             String name,
-            String birthDate,
+            LocalDate birthDate,
             String phoneNumber
     ) {
         this.loginId = loginId;
@@ -87,7 +87,7 @@ public class User {
     public static User create(
             String loginId,
             String name,
-            String birthDate,
+            LocalDate birthDate,
             String phoneNumber
     ) {
         return new User(loginId, name, birthDate, phoneNumber);

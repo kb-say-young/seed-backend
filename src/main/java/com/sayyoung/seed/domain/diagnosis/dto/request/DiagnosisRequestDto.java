@@ -33,7 +33,6 @@ public class DiagnosisRequestDto {
     @JsonProperty("goals")
     private List<GoalDto> goals;
 
-
     /**
      * 사용자 프로필 정보.
      */
