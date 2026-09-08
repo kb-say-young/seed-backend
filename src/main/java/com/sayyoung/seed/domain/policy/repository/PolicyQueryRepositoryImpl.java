@@ -4,8 +4,8 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sayyoung.seed.domain.policy.dto.PolicyMatchResult;
 import com.sayyoung.seed.domain.policy.dto.PolicyFilterCondition;
+import com.sayyoung.seed.domain.policy.dto.PolicyMatchResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -25,23 +25,36 @@ import static com.sayyoung.seed.domain.policy.entity.QPolicyTarget.policyTarget;
 @RequiredArgsConstructor
 public class PolicyQueryRepositoryImpl implements PolicyQueryRepository {
 
+    // 직업 제한 없음 코드
+    private static final String JOB_UNRESTRICTED_CODE = "0013010";
+
+    // 학력 제한 없음 코드
+    private static final String SCHOOL_UNRESTRICTED_CODE = "0049010";
+
+    // 특화 대상 제한 없음 코드
+    private static final String TARGET_UNRESTRICTED_CODE = "0014010";
+
+    // QueryDSL 쿼리 생성 객체
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<PolicyMatchResult> findByCondition(PolicyFilterCondition condition) {
-
+    public List<PolicyMatchResult> findMatchedPolicies(PolicyFilterCondition condition) {
         BooleanBuilder builder = new BooleanBuilder();
 
         // 카테고리 조건
-        builder.and(policy.category.id.eq(condition.getCategoryId()));
+        builder.and(
+                policy.category.id.eq(condition.getCategoryId())
+        );
 
         // 연령 조건
         if (condition.getAge() != null) {
             builder.and(
                     policy.minAge.eq(0)
                             .and(policy.maxAge.eq(0))
-                            .or(policy.minAge.loe(condition.getAge())
-                                    .and(policy.maxAge.goe(condition.getAge())))
+                            .or(
+                                    policy.minAge.loe(condition.getAge())
+                                            .and(policy.maxAge.goe(condition.getAge()))
+                            )
             );
         }
 
@@ -50,8 +63,10 @@ public class PolicyQueryRepositoryImpl implements PolicyQueryRepository {
             builder.and(
                     policy.incomeMin.eq(0L)
                             .and(policy.incomeMax.eq(0L))
-                            .or(policy.incomeMin.loe(condition.getIncome())
-                                    .and(policy.incomeMax.goe(condition.getIncome())))
+                            .or(
+                                    policy.incomeMin.loe(condition.getIncome())
+                                            .and(policy.incomeMax.goe(condition.getIncome()))
+                            )
             );
         }
 
@@ -68,15 +83,18 @@ public class PolicyQueryRepositoryImpl implements PolicyQueryRepository {
             );
         }
 
+        // 응답에 필요한 정책 정보만 조회
         JPQLQuery<PolicyMatchResult> query = queryFactory
                 .selectDistinct(
                         Projections.constructor(
                                 PolicyMatchResult.class,
                                 policy.id,
-                                policy.policyNo,
                                 policy.name,
                                 policy.description,
-                                policy.institutionName
+                                policy.institutionName,
+                                policy.applyStartDate,
+                                policy.applyEndDate,
+                                policy.independentYouth
                         )
                 )
                 .from(policy);
@@ -87,7 +105,9 @@ public class PolicyQueryRepositoryImpl implements PolicyQueryRepository {
                     .on(policyRegion.policy.eq(policy));
 
             builder.and(
-                    policyRegion.id.regionCode.eq(condition.getRegionCode())
+                    policyRegion.id.regionCode.eq(
+                            condition.getRegionCode()
+                    )
             );
         }
 
@@ -97,8 +117,12 @@ public class PolicyQueryRepositoryImpl implements PolicyQueryRepository {
                     .on(policyJob.policy.eq(policy));
 
             builder.and(
-                    policyJob.id.jobCode.eq("0013010")
-                            .or(policyJob.id.jobCode.eq(condition.getJobCode()))
+                    policyJob.id.jobCode.eq(JOB_UNRESTRICTED_CODE)
+                            .or(
+                                    policyJob.id.jobCode.eq(
+                                            condition.getJobCode()
+                                    )
+                            )
             );
         }
 
@@ -108,8 +132,12 @@ public class PolicyQueryRepositoryImpl implements PolicyQueryRepository {
                     .on(policySchool.policy.eq(policy));
 
             builder.and(
-                    policySchool.id.schoolCode.eq("0049010")
-                            .or(policySchool.id.schoolCode.eq(condition.getSchoolCode()))
+                    policySchool.id.schoolCode.eq(SCHOOL_UNRESTRICTED_CODE)
+                            .or(
+                                    policySchool.id.schoolCode.eq(
+                                            condition.getSchoolCode()
+                                    )
+                            )
             );
         }
 
@@ -119,8 +147,12 @@ public class PolicyQueryRepositoryImpl implements PolicyQueryRepository {
                     .on(policyTarget.policy.eq(policy));
 
             builder.and(
-                    policyTarget.id.targetCode.eq("0014010")
-                            .or(policyTarget.id.targetCode.eq(condition.getTargetCode()))
+                    policyTarget.id.targetCode.eq(TARGET_UNRESTRICTED_CODE)
+                            .or(
+                                    policyTarget.id.targetCode.eq(
+                                            condition.getTargetCode()
+                                    )
+                            )
             );
         }
 

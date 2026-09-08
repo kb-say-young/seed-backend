@@ -21,6 +21,12 @@ public enum SuccessCode implements ResponseCode {
             HttpStatus.CREATED,
             "COMMON_201",
             "리소스가 생성되었습니다."
+    ),
+
+    POLICY_RECOMMENDATION_READ_SUCCESS(
+            HttpStatus.OK,
+            "POLICY_200_001",
+            "맞춤 정책 조회에 성공했습니다."
     );
 
     private final HttpStatus httpStatus;

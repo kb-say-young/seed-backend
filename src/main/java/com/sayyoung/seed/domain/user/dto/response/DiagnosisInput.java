@@ -15,7 +15,7 @@ public record DiagnosisInput(
     public DiagnosisInput { goals = List.copyOf(goals); }
 
     public record Profile(
-            @JsonProperty("birth_date") String birthDate,
+            @JsonProperty("birth_date") LocalDate birthDate,
             @JsonProperty("protection_end_date") LocalDate protectionEndDate,
             @JsonProperty("is_youth_support") Boolean youthSupport,
             @JsonProperty("region_code") String regionCode,

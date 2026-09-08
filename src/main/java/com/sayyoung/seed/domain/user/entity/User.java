@@ -31,7 +31,7 @@ public class User {
     private String name;
 
     @Column(name = "birth_date", nullable = false, length = 8)
-    private String birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "phone_number", nullable = false, length = 11)
     private String phoneNumber;
@@ -69,7 +69,7 @@ public class User {
     private User(
             String loginId,
             String name,
-            String birthDate,
+            LocalDate birthDate,
             String phoneNumber,
             String education
     ) {
@@ -85,7 +85,7 @@ public class User {
      *
      * @param loginId     로그인 아이디
      * @param name        이름
-     * @param birthDate   생년월일(yyyyMMdd)
+     * @param birthDate   생년월일
      * @param phoneNumber 휴대폰 번호(하이픈 제외)
      * @param education   학력
      * @return 생성된 사용자 엔티티
@@ -93,7 +93,7 @@ public class User {
     public static User create(
             String loginId,
             String name,
-            String birthDate,
+            LocalDate birthDate,
             String phoneNumber,
             String education
     ) {

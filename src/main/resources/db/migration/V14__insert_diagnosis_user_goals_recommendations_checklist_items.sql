@@ -7,8 +7,8 @@ SET NAMES utf8mb4;
 START TRANSACTION;
 
 INSERT INTO users (user_id, login_id, name, birth_date, phone_number) VALUES
-(1, 'testuser1', '테스트유저1', '19990101', '01011112222'),
-(2, 'testuser2', '테스트유저2', '20000202', '01033334444');
+(1, 'testUser1', '테스트유저1', '19990101', '01011112222'),
+(2, 'testUser2', '테스트유저2', '20000202', '01033334444');
 
 INSERT INTO diagnosis (diagnosis_id, user_id, status, summary) VALUES
 (1, 1, 'completed', '주거비 부담 완화 및 저축 습관 형성을 위한 진단이 완료되었습니다.'),
