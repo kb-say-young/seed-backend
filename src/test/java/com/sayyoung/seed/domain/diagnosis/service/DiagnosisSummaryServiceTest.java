@@ -1,12 +1,14 @@
 package com.sayyoung.seed.domain.diagnosis.service;
 
 import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisSummaryResponse;
+import com.sayyoung.seed.domain.diagnosis.dto.response.MyRoadmapResponse;
 import com.sayyoung.seed.domain.diagnosis.entity.Diagnosis;
 import com.sayyoung.seed.domain.diagnosis.exception.DiagnosisErrorCode;
 import com.sayyoung.seed.domain.diagnosis.repository.DiagnosisRepository;
 import com.sayyoung.seed.domain.user.entity.User;
 import com.sayyoung.seed.domain.user.repository.UserRepository;
 import com.sayyoung.seed.global.exception.BusinessException;
+import com.sayyoung.seed.global.response.code.CommonErrorCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -216,5 +218,79 @@ class DiagnosisSummaryServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .extracting(e -> ((BusinessException) e).getErrorCode())
                 .isEqualTo(DiagnosisErrorCode.DIAGNOSIS_NOT_FOUND);
+    }
+
+    @Test
+    void 사용자의_가장_최근_진단을_기준으로_내_로드맵을_계산한다() {
+
+        // given
+        User user = userRepository.findById(SEEDED_USER_ID).orElseThrow();
+        Diagnosis diagnosis = diagnosisRepository.save(Diagnosis.create(user));
+        String itemKey = "my_roadmap_item_" + UUID.randomUUID();
+        String rawJson = """
+                {
+                  "roadmap_items": [
+                    {
+                      "item_key": "%s",
+                      "origin_sub_category": "23",
+                      "order_no": 1,
+                      "start_offset": { "value": 0, "unit": "month" },
+                      "duration": { "value": 5, "unit": "month" },
+                      "title": "테스트 추천 항목",
+                      "content": "테스트 상세 내용",
+                      "target_amount": 1000000,
+                      "amount_type": "saving",
+                      "target_condition": null,
+                      "next_action": "테스트 다음 행동",
+                      "citation": null,
+                      "checklist": []
+                    }
+                  ]
+                }
+                """.formatted(itemKey);
+        diagnosisResultService.applyRoadmap(diagnosis.getId(), rawJson);
+
+        try {
+            // when: 방금 생성한 진단이 이 사용자의 최신 진단이 된다
+            MyRoadmapResponse response = diagnosisSummaryService.getMyRoadmap(SEEDED_USER_ID);
+
+            // then
+            assertThat(response.getSummary().getTargetMonths()).isEqualTo(5);
+            assertThat(response.getSummary().getTotalCost()).isEqualByComparingTo(BigDecimal.valueOf(1_000_000));
+            // 사용자 2의 fixed_budget이 NULL이라 0
+            assertThat(response.getSummary().getSecuredAmount()).isEqualByComparingTo(BigDecimal.ZERO);
+            // 사용자 2의 protection_end_date가 NULL이라 protectionEndYm도 null
+            assertThat(response.getProtectionEndYm()).isNull();
+            assertThat(response.getPlanUntilYm()).isNotNull();
+        } finally {
+            diagnosisRepository.deleteById(diagnosis.getId());
+        }
+    }
+
+    @Test
+    void 진단이_없는_사용자는_내_로드맵_조회시_예외를_던진다() {
+
+        // given
+        User user = userRepository.save(User.create("roadmap_test_" + UUID.randomUUID(), "테스트", "20000101", "01000000000"));
+
+        try {
+            // when & then
+            assertThatThrownBy(() -> diagnosisSummaryService.getMyRoadmap(user.getId()))
+                    .isInstanceOf(BusinessException.class)
+                    .extracting(e -> ((BusinessException) e).getErrorCode())
+                    .isEqualTo(DiagnosisErrorCode.DIAGNOSIS_NOT_FOUND);
+        } finally {
+            userRepository.deleteById(user.getId());
+        }
+    }
+
+    @Test
+    void 존재하지_않는_사용자는_내_로드맵_조회시_인증_예외를_던진다() {
+
+        // when & then
+        assertThatThrownBy(() -> diagnosisSummaryService.getMyRoadmap(NOT_EXISTING_DIAGNOSIS_ID))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getErrorCode())
+                .isEqualTo(CommonErrorCode.UNAUTHORIZED);
     }
 }
