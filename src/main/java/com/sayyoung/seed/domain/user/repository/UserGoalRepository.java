@@ -12,6 +12,19 @@ import java.util.Optional;
  */
 public interface UserGoalRepository extends JpaRepository<UserGoal, Long> {
 
+    /** 트랜잭션 안에서 카테고리와 상위 카테고리를 함께 읽어 엔진 DTO로 변환한다. */
+    @org.springframework.data.jpa.repository.Query("""
+            select g from UserGoal g
+            join fetch g.category c
+            left join fetch c.parent
+            where g.user.id = :userId
+            order by g.id
+            """)
+    java.util.List<UserGoal> findDiagnosisGoalsByUserId(
+            @org.springframework.data.repository.query.Param("userId") Long userId
+    );
+
+
     /**
      * 사용자의 기존 목표를 모두 삭제합니다. 목표는 재제출 시 전체 교체됩니다.
      *

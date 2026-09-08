@@ -33,6 +33,9 @@ public class UserGoal {
     @Column(name = "description", nullable = false, columnDefinition = "json")
     private String description;
 
+    @Column(name = "status", nullable = false, length = 20)
+    private String status;
+
     private UserGoal(
             User user,
             Category category,
@@ -41,6 +44,7 @@ public class UserGoal {
         this.user = user;
         this.category = category;
         this.description = description;
+        this.status = "active";
     }
 
     /**
