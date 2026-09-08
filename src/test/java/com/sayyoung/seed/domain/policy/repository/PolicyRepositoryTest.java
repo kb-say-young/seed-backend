@@ -1,7 +1,7 @@
 package com.sayyoung.seed.domain.policy.repository;
 
-import com.sayyoung.seed.domain.policy.dto.PolicyMatchResult;
 import com.sayyoung.seed.domain.policy.dto.PolicyFilterCondition;
+import com.sayyoung.seed.domain.policy.dto.PolicyMatchResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,26 +21,21 @@ class PolicyRepositoryTest {
     void 세부_카테고리로_정책을_조회한다() {
 
         // given
-        PolicyFilterCondition condition = new PolicyFilterCondition(
-                "12",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                LocalDate.now()
-        );
+        PolicyFilterCondition condition = PolicyFilterCondition.builder()
+                .categoryId("12")
+                .currentDate(LocalDate.now())
+                .build();
 
         // when
-        List<PolicyMatchResult> result = policyRepository.findByCondition(condition);
+        List<PolicyMatchResult> result =
+                policyRepository.findMatchedPolicies(condition);
 
         // then
         assertThat(result).isNotEmpty();
 
         result.forEach(policy ->
                 System.out.println(
-                        policy.getPolicyId()
+                        policy.getId()
                                 + " / "
                                 + policy.getName()
                 )
@@ -51,30 +46,26 @@ class PolicyRepositoryTest {
     void 카테고리와_지역으로_정책을_조회한다() {
 
         // given
-        PolicyFilterCondition condition = new PolicyFilterCondition(
-                "12",
-                "11530",
-                null,
-                null,
-                null,
-                null,
-                null,
-                LocalDate.now()
-        );
+        PolicyFilterCondition condition = PolicyFilterCondition.builder()
+                .categoryId("12")
+                .regionCode("11530")
+                .currentDate(LocalDate.now())
+                .build();
 
         // when
-        List<PolicyMatchResult> result = policyRepository.findByCondition(condition);
+        List<PolicyMatchResult> result =
+                policyRepository.findMatchedPolicies(condition);
 
         // then
         assertThat(result).isNotEmpty();
 
         result.forEach(policy ->
                 System.out.println(
-                        policy.getPolicyId()
-                                + " / "
-                                + policy.getPolicyNo()
+                        policy.getId()
                                 + " / "
                                 + policy.getName()
+                                + " / "
+                                + policy.getInstitutionName()
                 )
         );
     }
@@ -83,26 +74,23 @@ class PolicyRepositoryTest {
     void 카테고리_지역_연령으로_정책을_조회한다() {
 
         // given
-        PolicyFilterCondition condition = new PolicyFilterCondition(
-                "12",
-                "11530",
-                24,
-                null,
-                null,
-                null,
-                null,
-                LocalDate.now()
-        );
+        PolicyFilterCondition condition = PolicyFilterCondition.builder()
+                .categoryId("12")
+                .regionCode("11530")
+                .age(24)
+                .currentDate(LocalDate.now())
+                .build();
 
         // when
-        List<PolicyMatchResult> result = policyRepository.findByCondition(condition);
+        List<PolicyMatchResult> result =
+                policyRepository.findMatchedPolicies(condition);
 
         // then
         assertThat(result).isNotEmpty();
 
         result.forEach(policy ->
                 System.out.println(
-                        policy.getPolicyId()
+                        policy.getId()
                                 + " / "
                                 + policy.getName()
                 )
@@ -112,24 +100,25 @@ class PolicyRepositoryTest {
     @Test
     void 카테고리_지역_연령_소득으로_정책을_조회한다() {
 
-        PolicyFilterCondition condition = new PolicyFilterCondition(
-                "12",
-                "11530",
-                24,
-                1_500_000L,
-                null,
-                null,
-                null,
-                LocalDate.now()
-        );
+        // given
+        PolicyFilterCondition condition = PolicyFilterCondition.builder()
+                .categoryId("12")
+                .regionCode("11530")
+                .age(24)
+                .income(1_500_000L)
+                .currentDate(LocalDate.now())
+                .build();
 
-        List<PolicyMatchResult> result = policyRepository.findByCondition(condition);
+        // when
+        List<PolicyMatchResult> result =
+                policyRepository.findMatchedPolicies(condition);
 
+        // then
         assertThat(result).isNotEmpty();
 
         result.forEach(policy ->
                 System.out.println(
-                        policy.getPolicyId()
+                        policy.getId()
                                 + " / "
                                 + policy.getName()
                 )
@@ -140,26 +129,22 @@ class PolicyRepositoryTest {
     void 직업_조건으로_정책을_조회한다() {
 
         // given
-        PolicyFilterCondition condition = new PolicyFilterCondition(
-                "21",
-                null,
-                null,
-                null,
-                "0013006",
-                null,
-                null,
-                LocalDate.now()
-        );
+        PolicyFilterCondition condition = PolicyFilterCondition.builder()
+                .categoryId("21")
+                .jobCode("0013006")
+                .currentDate(LocalDate.now())
+                .build();
 
         // when
-        List<PolicyMatchResult> result = policyRepository.findByCondition(condition);
+        List<PolicyMatchResult> result =
+                policyRepository.findMatchedPolicies(condition);
 
         // then
         assertThat(result).isNotEmpty();
 
         result.forEach(policy ->
                 System.out.println(
-                        policy.getPolicyId()
+                        policy.getId()
                                 + " / "
                                 + policy.getName()
                 )
@@ -172,20 +157,15 @@ class PolicyRepositoryTest {
         // given
         String userJobCode = "0013010";
 
-        PolicyFilterCondition condition =
-                new PolicyFilterCondition(
-                        "21",
-                        null,
-                        null,
-                        null,
-                        userJobCode,
-                        null,
-                        null,
-                        LocalDate.now()
-                );
+        PolicyFilterCondition condition = PolicyFilterCondition.builder()
+                .categoryId("21")
+                .jobCode(userJobCode)
+                .currentDate(LocalDate.now())
+                .build();
 
         // when
-        List<PolicyMatchResult> result = policyRepository.findByCondition(condition);
+        List<PolicyMatchResult> result =
+                policyRepository.findMatchedPolicies(condition);
 
         // then
         assertThat(result).isNotEmpty();
@@ -195,26 +175,22 @@ class PolicyRepositoryTest {
     void 학력_조건으로_정책을_조회한다() {
 
         // given
-        PolicyFilterCondition condition = new PolicyFilterCondition(
-                "21",
-                null,
-                null,
-                null,
-                null,
-                "0049010",
-                null,
-                LocalDate.now()
-        );
+        PolicyFilterCondition condition = PolicyFilterCondition.builder()
+                .categoryId("21")
+                .schoolCode("0049010")
+                .currentDate(LocalDate.now())
+                .build();
 
         // when
-        List<PolicyMatchResult> result = policyRepository.findByCondition(condition);
+        List<PolicyMatchResult> result =
+                policyRepository.findMatchedPolicies(condition);
 
         // then
         assertThat(result).isNotEmpty();
 
         result.forEach(policy ->
                 System.out.println(
-                        policy.getPolicyId()
+                        policy.getId()
                                 + " / "
                                 + policy.getName()
                 )
@@ -225,26 +201,22 @@ class PolicyRepositoryTest {
     void 특화대상_조건으로_정책을_조회한다() {
 
         // given
-        PolicyFilterCondition condition = new PolicyFilterCondition(
-                "21",
-                null,
-                null,
-                null,
-                null,
-                null,
-                "0014004",
-                LocalDate.now()
-        );
+        PolicyFilterCondition condition = PolicyFilterCondition.builder()
+                .categoryId("21")
+                .targetCode("0014004")
+                .currentDate(LocalDate.now())
+                .build();
 
         // when
-        List<PolicyMatchResult> result = policyRepository.findByCondition(condition);
+        List<PolicyMatchResult> result =
+                policyRepository.findMatchedPolicies(condition);
 
         // then
         assertThat(result).isNotEmpty();
 
         result.forEach(policy ->
                 System.out.println(
-                        policy.getPolicyId()
+                        policy.getId()
                                 + " / "
                                 + policy.getName()
                 )
@@ -255,28 +227,33 @@ class PolicyRepositoryTest {
     void 신청기간_조건으로_정책을_조회한다() {
 
         // given
-        PolicyFilterCondition condition = new PolicyFilterCondition(
-                "41",
-                "11530",
-                24,
-                1_500_000L,
-                "0013010",
-                "0049005",
-                "0014010",
-                LocalDate.of(2026, 9, 6)
-        );
+        PolicyFilterCondition condition = PolicyFilterCondition.builder()
+                .categoryId("41")
+                .regionCode("11530")
+                .age(24)
+                .income(1_500_000L)
+                .jobCode("0013010")
+                .schoolCode("0049005")
+                .targetCode("0014010")
+                .currentDate(LocalDate.of(2026, 9, 6))
+                .build();
 
         // when
-        List<PolicyMatchResult> result = policyRepository.findByCondition(condition);
+        List<PolicyMatchResult> result =
+                policyRepository.findMatchedPolicies(condition);
 
         // then
         assertThat(result).isNotEmpty();
 
         result.forEach(policy ->
                 System.out.println(
-                        policy.getPolicyId()
+                        policy.getId()
                                 + " / "
                                 + policy.getName()
+                                + " / "
+                                + policy.getApplyStartDate()
+                                + " ~ "
+                                + policy.getApplyEndDate()
                 )
         );
     }
@@ -285,30 +262,31 @@ class PolicyRepositoryTest {
     void 모든_조건으로_정책을_조회한다() {
 
         // given
-        PolicyFilterCondition condition = new PolicyFilterCondition(
-                "21",
-                "11530",
-                24,
-                1_500_000L,
-                "사용자_직업코드",
-                "사용자_학력코드",
-                "사용자_특화대상코드",
-                LocalDate.now()
-        );
+        PolicyFilterCondition condition = PolicyFilterCondition.builder()
+                .categoryId("21")
+                .regionCode("11530")
+                .age(24)
+                .income(1_500_000L)
+                .jobCode("사용자_직업코드")
+                .schoolCode("사용자_학력코드")
+                .targetCode("사용자_특화대상코드")
+                .currentDate(LocalDate.now())
+                .build();
 
         // when
-        List<PolicyMatchResult> result = policyRepository.findByCondition(condition);
+        List<PolicyMatchResult> result =
+                policyRepository.findMatchedPolicies(condition);
 
         // then
         assertThat(result).isNotNull();
 
         result.forEach(policy ->
                 System.out.println(
-                        policy.getPolicyId()
-                                + " / "
-                                + policy.getPolicyNo()
+                        policy.getId()
                                 + " / "
                                 + policy.getName()
+                                + " / "
+                                + policy.isIndependentYouth()
                 )
         );
     }
