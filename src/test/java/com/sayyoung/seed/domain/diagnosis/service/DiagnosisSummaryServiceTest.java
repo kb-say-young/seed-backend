@@ -271,7 +271,8 @@ class DiagnosisSummaryServiceTest {
     void 진단이_없는_사용자는_내_로드맵_조회시_예외를_던진다() {
 
         // given
-        User user = userRepository.save(User.create("roadmap_test_" + UUID.randomUUID(), "테스트", "20000101", "01000000000"));
+        String loginId = "rm_" + UUID.randomUUID().toString().substring(0, 8);
+        User user = userRepository.save(User.create(loginId, "테스트", "20000101", "01000000000"));
 
         try {
             // when & then
