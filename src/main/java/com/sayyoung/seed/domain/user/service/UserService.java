@@ -62,7 +62,12 @@ public class UserService {
     ) {
         validateDuplicateLoginId(request.getLoginId());
 
-        User user = User.create(request.getLoginId());
+        User user = User.create(
+                request.getLoginId(),
+                request.getName(),
+                request.getBirthDate(),
+                request.getPhoneNumber()
+        );
         userRepository.save(user);
 
         return UserResponse.from(user);
