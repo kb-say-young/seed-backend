@@ -86,6 +86,109 @@ class DiagnosisSummaryServiceTest {
     }
 
     @Test
+    void amount_type가_saving이_아닌_추천항목은_이번달_목표_저축액_합산에서_제외한다() {
+
+        // given
+        User user = userRepository.findById(SEEDED_USER_ID).orElseThrow();
+        Diagnosis diagnosis = diagnosisRepository.save(Diagnosis.create(user));
+        String savingItemKey = "saving_item_" + UUID.randomUUID();
+        String expenseItemKey = "expense_item_" + UUID.randomUUID();
+        String rawJson = """
+                {
+                  "roadmap_items": [
+                    {
+                      "item_key": "%s",
+                      "origin_sub_category": "23",
+                      "order_no": 1,
+                      "start_offset": { "value": 0, "unit": "month" },
+                      "duration": { "value": 4, "unit": "month" },
+                      "title": "저축 추천 항목",
+                      "content": "테스트 상세 내용",
+                      "target_amount": 500000,
+                      "amount_type": "saving",
+                      "target_condition": null,
+                      "next_action": "테스트 다음 행동",
+                      "citation": null,
+                      "checklist": []
+                    },
+                    {
+                      "item_key": "%s",
+                      "origin_sub_category": "23",
+                      "order_no": 2,
+                      "start_offset": { "value": 0, "unit": "month" },
+                      "duration": { "value": 4, "unit": "month" },
+                      "title": "지출 감소 추천 항목",
+                      "content": "테스트 상세 내용",
+                      "target_amount": 300000,
+                      "amount_type": "expense",
+                      "target_condition": null,
+                      "next_action": "테스트 다음 행동",
+                      "citation": null,
+                      "checklist": []
+                    }
+                  ]
+                }
+                """.formatted(savingItemKey, expenseItemKey);
+        diagnosisResultService.applyRoadmap(diagnosis.getId(), rawJson);
+
+        try {
+            // when
+            DiagnosisSummaryResponse response = diagnosisSummaryService.getSummary(diagnosis.getId());
+
+            // then: expense 300,000은 합산에서 빠지고 saving 500,000만 4개월로 나뉜다 (125,000)
+            assertThat(response.getMonthlyTargetSaving()).isEqualByComparingTo(BigDecimal.valueOf(125_000));
+        } finally {
+            diagnosisRepository.deleteById(diagnosis.getId());
+        }
+    }
+
+    @Test
+    void 누적액이_목표금액보다_크면_이번달_목표_저축액은_음수가_아니라_0이다() {
+
+        // given
+        User user = userRepository.findById(SEEDED_USER_ID).orElseThrow();
+        user.updateProfile(null, null, BigDecimal.valueOf(5_000_000), null, null, null, null);
+        userRepository.save(user);
+
+        Diagnosis diagnosis = diagnosisRepository.save(Diagnosis.create(user));
+        String itemKey = "over_budget_item_" + UUID.randomUUID();
+        String rawJson = """
+                {
+                  "roadmap_items": [
+                    {
+                      "item_key": "%s",
+                      "origin_sub_category": "23",
+                      "order_no": 1,
+                      "start_offset": { "value": 0, "unit": "month" },
+                      "duration": { "value": 4, "unit": "month" },
+                      "title": "저축 추천 항목",
+                      "content": "테스트 상세 내용",
+                      "target_amount": 1000000,
+                      "amount_type": "saving",
+                      "target_condition": null,
+                      "next_action": "테스트 다음 행동",
+                      "citation": null,
+                      "checklist": []
+                    }
+                  ]
+                }
+                """.formatted(itemKey);
+        diagnosisResultService.applyRoadmap(diagnosis.getId(), rawJson);
+
+        try {
+            // when
+            DiagnosisSummaryResponse response = diagnosisSummaryService.getSummary(diagnosis.getId());
+
+            // then: 누적액 5,000,000 > 목표금액 1,000,000이라 음수가 아니라 0
+            assertThat(response.getMonthlyTargetSaving()).isEqualByComparingTo(BigDecimal.ZERO);
+        } finally {
+            diagnosisRepository.deleteById(diagnosis.getId());
+            user.updateProfile(null, null, null, null, null, null, null);
+            userRepository.save(user);
+        }
+    }
+
+    @Test
     void 연관된_추천이_없으면_목표_개월수는_0이고_이번달_목표_저축액은_null이다() {
 
         // given
