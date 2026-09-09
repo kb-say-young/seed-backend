@@ -85,6 +85,14 @@ public class ChecklistItem {
     }
 
     /**
+     * 체크리스트 항목을 미완료(todo) 상태로 되돌리고 완료 일시를 지웁니다.
+     */
+    public void uncomplete() {
+        this.status = STATUS_TODO;
+        this.completedAt = null;
+    }
+
+    /**
      * 체크리스트 항목이 완료(done) 상태인지 확인합니다.
      */
     public boolean isDone() {

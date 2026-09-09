@@ -70,10 +70,11 @@ public class RecommendationService {
                 .collect(Collectors.groupingBy(item -> item.getRecommendation().getId()));
 
         return recommendations.stream()
-                .map(recommendation -> RecommendationResponse.from(
-                        recommendation,
-                        deriveStatus(checklistItemsByRecommendationId.getOrDefault(recommendation.getId(), List.of()))
-                ))
+                .map(recommendation -> {
+                    List<ChecklistItem> checklistItems = checklistItemsByRecommendationId
+                            .getOrDefault(recommendation.getId(), List.of());
+                    return RecommendationResponse.from(recommendation, checklistItems, deriveStatus(checklistItems));
+                })
                 .toList();
     }
 
@@ -134,6 +135,38 @@ public class RecommendationService {
             Long checklistItemId,
             ChecklistItemCompleteRequest request
     ) {
+        ChecklistItem checklistItem = findOwnedChecklistItem(userId, checklistItemId);
+
+        checklistItem.complete();
+    }
+
+    /**
+     * 체크리스트 항목을 미완료 상태로 되돌립니다. 잘못 눌렀거나 마음이 바뀐 경우를 위한 반대 동작이며,
+     * cost/date 는 애초에 저장하지 않으므로(완료 요청 정보 참고) 되돌릴 부수 데이터가 없습니다.
+     *
+     * @param userId           요청한 사용자 식별자
+     * @param checklistItemId  미완료 처리할 체크리스트 항목 식별자
+     * @throws BusinessException 존재하지 않는 체크리스트 항목이거나, 다른 사용자 소유인 경우
+     */
+    @Transactional
+    public void uncompleteChecklistItem(
+            Long userId,
+            Long checklistItemId
+    ) {
+        ChecklistItem checklistItem = findOwnedChecklistItem(userId, checklistItemId);
+
+        checklistItem.uncomplete();
+    }
+
+    /**
+     * 체크리스트 항목을 조회하고, 요청한 사용자의 소유인지 확인합니다.
+     *
+     * @throws BusinessException 존재하지 않는 체크리스트 항목이거나, 다른 사용자 소유인 경우
+     */
+    private ChecklistItem findOwnedChecklistItem(
+            Long userId,
+            Long checklistItemId
+    ) {
         ChecklistItem checklistItem = checklistItemRepository.findById(checklistItemId)
                 .orElseThrow(() -> new BusinessException(DiagnosisErrorCode.CHECKLIST_ITEM_NOT_FOUND));
 
@@ -142,6 +175,6 @@ public class RecommendationService {
             throw new BusinessException(CommonErrorCode.FORBIDDEN);
         }
 
-        checklistItem.complete();
+        return checklistItem;
     }
 }
