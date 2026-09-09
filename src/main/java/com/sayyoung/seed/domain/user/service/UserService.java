@@ -15,6 +15,7 @@ import com.sayyoung.seed.domain.user.dto.request.IntakeRequest;
 import com.sayyoung.seed.domain.user.dto.request.LoginRequest;
 import com.sayyoung.seed.domain.user.dto.request.SignUpRequest;
 import com.sayyoung.seed.domain.user.dto.request.UserProfileRequest;
+import com.sayyoung.seed.domain.user.dto.response.UserMeResponse;
 import com.sayyoung.seed.domain.user.dto.response.UserResponse;
 import com.sayyoung.seed.domain.user.entity.User;
 import com.sayyoung.seed.domain.user.entity.UserGoal;
@@ -28,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 사용자 관련 비즈니스 로직을 처리합니다.
@@ -91,6 +94,33 @@ public class UserService {
         refreshTokenService.save(user.getId(), refreshToken);
 
         return TokenResponse.of(accessToken, refreshToken);
+    }
+
+    /**
+     * 인증된 사용자의 기본 정보와 진단 프로필을 조회합니다.
+     * 진단 정보 제출(intake) 전이라면 profile은 null로 반환한다.
+     *
+     * @param userId 인증된 사용자 식별자
+     * @return 사용자 기본 정보와 진단 프로필을 담은 응답
+     * @throws BusinessException 사용자가 존재하지 않는 경우
+     */
+    public UserMeResponse getMe(
+            Long userId
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+
+        UserMeResponse.Profile profile = null;
+        if (user.getRegionCode() != null) {
+            String regionDisplay = regionRepository.findByRegionCode(user.getRegionCode())
+                    .map(region -> Stream.of(region.getSidoName(), region.getSigunguName())
+                            .filter(Objects::nonNull).filter(s -> !s.isBlank())
+                            .collect(Collectors.joining(" ")))
+                    .orElse(null);
+            profile = UserMeResponse.Profile.of(user, regionDisplay);
+        }
+
+        return UserMeResponse.of(user, profile);
     }
 
     /**

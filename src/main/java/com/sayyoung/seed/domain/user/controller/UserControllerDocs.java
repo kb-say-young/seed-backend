@@ -5,6 +5,7 @@ import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisStatusResponse;
 import com.sayyoung.seed.domain.user.dto.request.IntakeRequest;
 import com.sayyoung.seed.domain.user.dto.request.LoginRequest;
 import com.sayyoung.seed.domain.user.dto.request.SignUpRequest;
+import com.sayyoung.seed.domain.user.dto.response.UserMeResponse;
 import com.sayyoung.seed.domain.user.dto.response.UserResponse;
 import com.sayyoung.seed.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,6 +71,32 @@ public interface UserControllerDocs {
     })
     ResponseEntity<ApiResponse<TokenResponse>> login(
             @Valid LoginRequest request
+    );
+
+    /**
+     * 내 정보 조회 API 명세입니다.
+     *
+     * @param userId 액세스 토큰에서 추출된 사용자 식별자
+     * @return 사용자 기본 정보와 진단 프로필(intake 전이면 profile: null)을 담은 공통 응답
+     */
+    @Operation(
+            summary = "내 정보 조회",
+            description = "인증된 사용자의 기본 정보와 진단 프로필을 조회합니다. " +
+                    "진단 정보 제출(intake) 전이라면 profile은 null로 반환됩니다."
+    )
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "내 정보 조회 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증되지 않은 요청"
+            )
+    })
+    ResponseEntity<ApiResponse<UserMeResponse>> getMe(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal Long userId
     );
 
     /**

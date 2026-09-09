@@ -6,6 +6,7 @@ import com.sayyoung.seed.domain.diagnosis.service.DiagnosisService;
 import com.sayyoung.seed.domain.user.dto.request.IntakeRequest;
 import com.sayyoung.seed.domain.user.dto.request.LoginRequest;
 import com.sayyoung.seed.domain.user.dto.request.SignUpRequest;
+import com.sayyoung.seed.domain.user.dto.response.UserMeResponse;
 import com.sayyoung.seed.domain.user.dto.response.UserResponse;
 import com.sayyoung.seed.domain.user.service.UserService;
 import com.sayyoung.seed.global.exception.BusinessException;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +49,19 @@ public class UserController implements UserControllerDocs {
             @Valid @RequestBody LoginRequest request
     ) {
         TokenResponse response = userService.login(request);
+
+        return ResponseFactory.success(SuccessCode.COMMON_OK, response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserMeResponse>> getMe(
+            @AuthenticationPrincipal Long userId
+    ) {
+        if (userId == null) {
+            throw new BusinessException(CommonErrorCode.UNAUTHORIZED);
+        }
+
+        UserMeResponse response = userService.getMe(userId);
 
         return ResponseFactory.success(SuccessCode.COMMON_OK, response);
     }
