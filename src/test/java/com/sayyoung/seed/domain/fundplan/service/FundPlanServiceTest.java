@@ -6,6 +6,7 @@ import com.sayyoung.seed.domain.diagnosis.service.DiagnosisSummaryService;
 import com.sayyoung.seed.domain.fundplan.dto.request.FundPlanAllocationRequest;
 import com.sayyoung.seed.domain.fundplan.dto.request.FundPlanAllocationUpdateRequest;
 import com.sayyoung.seed.domain.fundplan.dto.response.FundPlanResponse;
+import com.sayyoung.seed.domain.fundplan.exception.FundPlanErrorCode;
 import com.sayyoung.seed.domain.policy.entity.Category;
 import com.sayyoung.seed.domain.policy.repository.CategoryRepository;
 import com.sayyoung.seed.domain.savings.entity.BudgetAllocation;
@@ -116,6 +117,8 @@ class FundPlanServiceTest {
     void 배분_비율_합계가_100이_아니면_예외가_발생한다() {
 
         // given
+        when(budgetAllocationRepository.findByUserId(USER_ID)).thenReturn(List.of());
+
         FundPlanAllocationUpdateRequest request = updateRequest(
                 allocationRequest("housing", new BigDecimal("30")),
                 allocationRequest("work", new BigDecimal("30"))
@@ -124,6 +127,47 @@ class FundPlanServiceTest {
         // when & then
         assertThatThrownBy(() -> fundPlanService.updateAllocation(USER_ID, request))
                 .isInstanceOf(BusinessException.class);
+
+        verify(diagnosisSummaryService, never()).getMyRoadmap(any());
+    }
+
+    @Test
+    void 일부_버킷만_수정해도_전체_배분_합계가_100이_아니면_예외가_발생한다() {
+
+        // given
+        // 기존에 housing이 45%를 차지하고 있는 상태에서, 이를 그대로 둔 채 living만 100%로
+        // 수정하면 전체 합계가 145%가 되어 저장을 거부해야 한다.
+        BudgetAllocation housingAllocation = allocationMock(HOUSING_ROOT_ID, new BigDecimal("40.00"),
+                new BigDecimal("1200000"), new BigDecimal("45.00"), new BigDecimal("1350000"));
+        when(budgetAllocationRepository.findByUserId(USER_ID)).thenReturn(List.of(housingAllocation));
+
+        FundPlanAllocationUpdateRequest request = updateRequest(
+                allocationRequest("living", new BigDecimal("100"))
+        );
+
+        // when & then
+        assertThatThrownBy(() -> fundPlanService.updateAllocation(USER_ID, request))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(exception ->
+                        assertThat(((BusinessException) exception).getErrorCode())
+                                .isEqualTo(FundPlanErrorCode.ALLOCATION_SUM_INVALID));
+    }
+
+    @Test
+    void 같은_버킷_키가_중복되면_예외가_발생한다() {
+
+        // given
+        FundPlanAllocationUpdateRequest request = updateRequest(
+                allocationRequest("housing", new BigDecimal("50")),
+                allocationRequest("housing", new BigDecimal("50"))
+        );
+
+        // when & then
+        assertThatThrownBy(() -> fundPlanService.updateAllocation(USER_ID, request))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(exception ->
+                        assertThat(((BusinessException) exception).getErrorCode())
+                                .isEqualTo(FundPlanErrorCode.DUPLICATE_BUCKET_KEY));
 
         verify(budgetAllocationRepository, never()).findByUserId(any());
     }
@@ -135,12 +179,15 @@ class FundPlanServiceTest {
         FundPlanAllocationUpdateRequest request = updateRequest(
                 allocationRequest("invalid", new BigDecimal("100"))
         );
-        stubRoadmap(60, new BigDecimal("10000000"), new BigDecimal("0"));
-        when(budgetAllocationRepository.findByUserId(USER_ID)).thenReturn(List.of());
 
         // when & then
         assertThatThrownBy(() -> fundPlanService.updateAllocation(USER_ID, request))
-                .isInstanceOf(BusinessException.class);
+                .isInstanceOf(BusinessException.class)
+                .satisfies(exception ->
+                        assertThat(((BusinessException) exception).getErrorCode())
+                                .isEqualTo(FundPlanErrorCode.INVALID_BUCKET));
+
+        verify(budgetAllocationRepository, never()).findByUserId(any());
     }
 
     @Test
@@ -201,6 +248,49 @@ class FundPlanServiceTest {
         assertThat(created.getCategory()).isEqualTo(rootCategory);
         assertThat(created.getUserRatio()).isEqualByComparingTo("100");
         assertThat(created.getUserAmount()).isEqualByComparingTo("10000000");
+        // ai_ratio/ai_amount는 DB에서 NOT NULL이므로 "추천 없음"을 뜻하는 0으로 채워져야 한다.
+        assertThat(created.getAiRatio()).isEqualByComparingTo("0");
+        assertThat(created.getAiAmount()).isEqualByComparingTo("0");
+    }
+
+    @Test
+    void 매칭되는_리프가_여러개면_반올림해도_배분_합계가_요청값과_정확히_일치한다() {
+
+        // given
+        BudgetAllocation leaf1 = leafAllocationMock(WORK_ROOT_ID, new BigDecimal("10.00"));
+        BudgetAllocation leaf2 = leafAllocationMock(WORK_ROOT_ID, new BigDecimal("10.00"));
+        BudgetAllocation leaf3 = leafAllocationMock(WORK_ROOT_ID, new BigDecimal("10.00"));
+        when(budgetAllocationRepository.findByUserId(USER_ID)).thenReturn(List.of(leaf1, leaf2, leaf3));
+        stubRoadmap(60, new BigDecimal("10000000"), new BigDecimal("0"));
+        when(savingsQueryRepository.findAllByUserIdAndRootCategoryId(any(), any())).thenReturn(List.of());
+
+        FundPlanAllocationUpdateRequest request = updateRequest(
+                allocationRequest("work", new BigDecimal("100"))
+        );
+
+        // when
+        fundPlanService.updateAllocation(USER_ID, request);
+
+        // then
+        ArgumentCaptor<BigDecimal> ratio1 = ArgumentCaptor.forClass(BigDecimal.class);
+        ArgumentCaptor<BigDecimal> amount1 = ArgumentCaptor.forClass(BigDecimal.class);
+        verify(leaf1).updateAllocation(ratio1.capture(), amount1.capture());
+
+        ArgumentCaptor<BigDecimal> ratio2 = ArgumentCaptor.forClass(BigDecimal.class);
+        ArgumentCaptor<BigDecimal> amount2 = ArgumentCaptor.forClass(BigDecimal.class);
+        verify(leaf2).updateAllocation(ratio2.capture(), amount2.capture());
+
+        ArgumentCaptor<BigDecimal> ratio3 = ArgumentCaptor.forClass(BigDecimal.class);
+        ArgumentCaptor<BigDecimal> amount3 = ArgumentCaptor.forClass(BigDecimal.class);
+        verify(leaf3).updateAllocation(ratio3.capture(), amount3.capture());
+
+        BigDecimal ratioSum = ratio1.getValue().add(ratio2.getValue()).add(ratio3.getValue());
+        BigDecimal amountSum = amount1.getValue().add(amount2.getValue()).add(amount3.getValue());
+
+        // 각 리프의 비율/금액은 독립적으로 반올림되지만, 마지막 리프가 잔여분을 흡수해
+        // 합계는 요청한 pct/amount와 정확히 일치해야 한다.
+        assertThat(ratioSum).isEqualByComparingTo("100");
+        assertThat(amountSum).isEqualByComparingTo("10000000");
     }
 
     private void stubRoadmap(
@@ -229,6 +319,26 @@ class FundPlanServiceTest {
         lenient().when(allocation.getAiAmount()).thenReturn(aiAmount);
         lenient().when(allocation.resolveRatio()).thenReturn(userRatio != null ? userRatio : aiRatio);
         lenient().when(allocation.resolveGoalAmount()).thenReturn(userAmount != null ? userAmount : aiAmount);
+        return allocation;
+    }
+
+    /**
+     * 루트 카테고리 자신이 아니라 그 하위 리프에 매칭되는 배분을 흉내낸다(다중 리프 안분 테스트용).
+     */
+    private BudgetAllocation leafAllocationMock(
+            String rootCategoryId,
+            BigDecimal aiRatio
+    ) {
+        Category root = mock(Category.class);
+        lenient().when(root.getId()).thenReturn(rootCategoryId);
+
+        Category leaf = mock(Category.class);
+        lenient().when(leaf.getId()).thenReturn("leaf");
+        lenient().when(leaf.getParent()).thenReturn(root);
+
+        BudgetAllocation allocation = mock(BudgetAllocation.class);
+        lenient().when(allocation.getCategory()).thenReturn(leaf);
+        lenient().when(allocation.getAiRatio()).thenReturn(aiRatio);
         return allocation;
     }
 

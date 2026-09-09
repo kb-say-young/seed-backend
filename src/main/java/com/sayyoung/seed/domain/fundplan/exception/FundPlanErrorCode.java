@@ -28,6 +28,15 @@ public enum FundPlanErrorCode implements ErrorResponseCode {
             HttpStatus.BAD_REQUEST,
             "FUNDPLAN_400_002",
             "배분 비율의 합계는 100이어야 합니다."
+    ),
+
+    /**
+     * allocations에 동일한 카테고리 키가 두 번 이상 포함된 경우 발생합니다.
+     */
+    DUPLICATE_BUCKET_KEY(
+            HttpStatus.BAD_REQUEST,
+            "FUNDPLAN_400_003",
+            "배분 목록에 동일한 카테고리 키가 중복되었습니다."
     );
 
     private final HttpStatus httpStatus;

@@ -26,7 +26,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -76,28 +78,47 @@ public class FundPlanServiceImpl implements FundPlanService {
             Long userId,
             FundPlanAllocationUpdateRequest request
     ) {
-        BigDecimal requestedSum = request.getAllocations().stream()
-                .map(FundPlanAllocationRequest::getPct)
+        Map<FundPlanBucket, BigDecimal> requestedPctByBucket = resolveRequestedPctByBucket(request);
+
+        List<BudgetAllocation> allocations = budgetAllocationRepository.findByUserId(userId);
+
+        BigDecimal projectedSum = Arrays.stream(FundPlanBucket.values())
+                .map(bucket -> requestedPctByBucket.getOrDefault(bucket, resolvePct(allocations, bucket)))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        if (requestedSum.compareTo(ALLOCATION_SUM_TARGET) != 0) {
+        if (projectedSum.compareTo(ALLOCATION_SUM_TARGET) != 0) {
             throw new BusinessException(FundPlanErrorCode.ALLOCATION_SUM_INVALID);
         }
 
-        List<BudgetAllocation> allocations = budgetAllocationRepository.findByUserId(userId);
         BigDecimal totalFund = diagnosisSummaryService.getMyRoadmap(userId).getSummary().getTotalCost();
 
+        for (Map.Entry<FundPlanBucket, BigDecimal> entry : requestedPctByBucket.entrySet()) {
+            BigDecimal pct = entry.getValue();
+            BigDecimal amount = totalFund.multiply(pct)
+                    .divide(ALLOCATION_SUM_TARGET, 0, RoundingMode.HALF_UP);
+
+            applyAllocation(userId, entry.getKey(), allocations, pct, amount);
+        }
+
+        return getFundPlan(userId);
+    }
+
+    /**
+     * 요청의 카테고리 키를 버킷으로 변환하고 중복 키를 걷어낸다. 같은 버킷이 두 번 이상 오면
+     * 어느 값을 반영해야 할지 모호하므로 저장을 거부한다.
+     */
+    private Map<FundPlanBucket, BigDecimal> resolveRequestedPctByBucket(
+            FundPlanAllocationUpdateRequest request
+    ) {
+        Map<FundPlanBucket, BigDecimal> requestedPctByBucket = new LinkedHashMap<>();
         for (FundPlanAllocationRequest allocationRequest : request.getAllocations()) {
             FundPlanBucket bucket = FundPlanBucket.fromKey(allocationRequest.getKey())
                     .orElseThrow(() -> new BusinessException(FundPlanErrorCode.INVALID_BUCKET));
 
-            BigDecimal pct = allocationRequest.getPct();
-            BigDecimal amount = totalFund.multiply(pct)
-                    .divide(ALLOCATION_SUM_TARGET, 0, RoundingMode.HALF_UP);
-
-            applyAllocation(userId, bucket, allocations, pct, amount);
+            if (requestedPctByBucket.put(bucket, allocationRequest.getPct()) != null) {
+                throw new BusinessException(FundPlanErrorCode.DUPLICATE_BUCKET_KEY);
+            }
         }
-
-        return getFundPlan(userId);
+        return requestedPctByBucket;
     }
 
     /**
@@ -134,13 +155,30 @@ public class FundPlanServiceImpl implements FundPlanService {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        for (BudgetAllocation leaf : matched) {
-            BigDecimal weight = weightSum.signum() > 0 && leaf.getAiRatio() != null
-                    ? leaf.getAiRatio().divide(weightSum, 10, RoundingMode.HALF_UP)
-                    : BigDecimal.ONE.divide(BigDecimal.valueOf(matched.size()), 10, RoundingMode.HALF_UP);
+        BigDecimal remainingRatio = pct;
+        BigDecimal remainingAmount = amount;
 
-            BigDecimal leafRatio = pct.multiply(weight).setScale(2, RoundingMode.HALF_UP);
-            BigDecimal leafAmount = amount.multiply(weight).setScale(0, RoundingMode.HALF_UP);
+        for (int i = 0; i < matched.size(); i++) {
+            BudgetAllocation leaf = matched.get(i);
+            boolean isLastLeaf = i == matched.size() - 1;
+
+            BigDecimal leafRatio;
+            BigDecimal leafAmount;
+            if (isLastLeaf) {
+                // 리프별로 독립 반올림하면 합계가 pct/amount와 어긋날 수 있어, 마지막 리프가 남은 잔여분을 그대로 받는다.
+                leafRatio = remainingRatio;
+                leafAmount = remainingAmount;
+            } else {
+                BigDecimal weight = weightSum.signum() > 0 && leaf.getAiRatio() != null
+                        ? leaf.getAiRatio().divide(weightSum, 10, RoundingMode.HALF_UP)
+                        : BigDecimal.ONE.divide(BigDecimal.valueOf(matched.size()), 10, RoundingMode.HALF_UP);
+
+                leafRatio = pct.multiply(weight).setScale(2, RoundingMode.HALF_UP);
+                leafAmount = amount.multiply(weight).setScale(0, RoundingMode.HALF_UP);
+                remainingRatio = remainingRatio.subtract(leafRatio);
+                remainingAmount = remainingAmount.subtract(leafAmount);
+            }
+
             leaf.updateAllocation(leafRatio, leafAmount);
         }
     }
@@ -153,10 +191,7 @@ public class FundPlanServiceImpl implements FundPlanService {
     ) {
         List<BudgetAllocation> matched = findMatched(allocations, bucket);
 
-        BigDecimal pct = matched.stream()
-                .map(BudgetAllocation::resolveRatio)
-                .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal pct = resolvePct(matched);
 
         BigDecimal budget = matched.stream()
                 .map(BudgetAllocation::getAiAmount)
@@ -182,6 +217,26 @@ public class FundPlanServiceImpl implements FundPlanService {
                 amount,
                 targetMonths
         );
+    }
+
+    /**
+     * 버킷에 매칭되는 배분들의 확정 비율(resolveRatio) 합계를 계산한다. updateAllocation()의
+     * 전체 합계 검증과 toBucketResponse()의 pct 응답 계산이 같은 계산을 공유한다.
+     */
+    private BigDecimal resolvePct(
+            List<BudgetAllocation> allocations,
+            FundPlanBucket bucket
+    ) {
+        return resolvePct(findMatched(allocations, bucket));
+    }
+
+    private BigDecimal resolvePct(
+            List<BudgetAllocation> matched
+    ) {
+        return matched.stream()
+                .map(BudgetAllocation::resolveRatio)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private List<BudgetAllocation> findMatched(

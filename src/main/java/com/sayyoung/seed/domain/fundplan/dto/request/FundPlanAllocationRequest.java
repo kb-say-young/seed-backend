@@ -1,6 +1,8 @@
 package com.sayyoung.seed.domain.fundplan.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -23,5 +25,7 @@ public class FundPlanAllocationRequest {
 
     @Schema(description = "배분 비율(%)", example = "40")
     @NotNull(message = "배분 비율은 필수입니다.")
+    @DecimalMin(value = "0", message = "배분 비율은 0 이상이어야 합니다.")
+    @DecimalMax(value = "100", message = "배분 비율은 100 이하이어야 합니다.")
     private BigDecimal pct;
 }

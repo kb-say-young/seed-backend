@@ -49,11 +49,14 @@ public class BudgetAllocation {
     ) {
         this.user = user;
         this.category = category;
+        this.aiRatio = BigDecimal.ZERO;
+        this.aiAmount = BigDecimal.ZERO;
     }
 
     /**
      * AI 추천 배분이 없던 카테고리에 사용자가 처음 배분을 설정할 때 새 행을 생성합니다.
-     * 비율/금액은 이후 {@link #updateAllocation}으로 채웁니다.
+     * ai_ratio/ai_amount는 DB 컬럼이 NOT NULL이라 "추천 없음"을 뜻하는 0으로 채우고,
+     * 사용자 비율/금액은 이후 {@link #updateAllocation}으로 채웁니다.
      */
     public static BudgetAllocation create(
             User user,
