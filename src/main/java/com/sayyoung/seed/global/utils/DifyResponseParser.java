@@ -1,6 +1,7 @@
 package com.sayyoung.seed.global.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sayyoung.seed.domain.diagnosis.dto.response.DifyWorkflowResponseDto;
 
@@ -13,7 +14,10 @@ public final class DifyResponseParser {
     // Spring Boot 4.1의 자동 구성 ObjectMapper 빈은 Jackson 3(tools.jackson.databind) 타입이라
     // 여기서 필요한 Jackson 2(com.fasterxml.jackson.databind) 타입 빈이 없다. 파싱 용도로만
     // 쓰이므로 빈 주입 없이 직접 생성한다 (UserService와 동일한 이유).
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    // Dify 응답에는 task_id/elapsed_time 등 우리가 쓰지 않는 실행 메타데이터 필드가 함께 오므로,
+    // DTO에 없는 필드를 만나도 파싱이 실패하지 않도록 unknown 필드를 무시한다.
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private DifyResponseParser() {
     }

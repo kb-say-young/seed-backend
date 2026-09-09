@@ -67,6 +67,41 @@ class DifyResponseParserTest {
     }
 
     @Test
+    void DTO에_없는_실행_메타데이터_필드가_섞여_있어도_파싱에_성공한다() {
+
+        // given: 실제 Dify Workflow API 응답에는 task_id/elapsed_time 등
+        // 우리 DTO가 매핑하지 않는 실행 메타데이터 필드가 함께 온다.
+        String json = """
+                {
+                  "task_id": "bdb4b6e1-9838-45aa-8ea1-d376c40d60ad",
+                  "workflow_run_id": "eb7b5d13-25d0-4c70-966d-31917687de27",
+                  "data": {
+                    "id": "eb7b5d13-25d0-4c70-966d-31917687de27",
+                    "workflow_id": "cc655ae3-e5ff-41dc-983e-eed3351051ed",
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": []
+                      }
+                    },
+                    "error": null
+                  },
+                  "elapsed_time": 10.087172,
+                  "total_tokens": 2055,
+                  "total_steps": 5,
+                  "created_at": 1788925537,
+                  "finished_at": 1788925548
+                }
+                """;
+
+        // when
+        DifyWorkflowResponseDto response = DifyResponseParser.parse(json);
+
+        // then
+        assertThat(response.getRoadmapItems()).isEmpty();
+    }
+
+    @Test
     void 형식이_잘못된_JSON은_파싱_예외를_던진다() {
 
         // given
