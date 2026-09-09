@@ -97,6 +97,7 @@ public class DiagnosisSummaryService {
                 : null;
 
         return MyRoadmapResponse.of(
+                diagnosis.getId(),
                 protectionEndYm,
                 planUntilYm,
                 RoadmapSummaryResponse.of(targetMonths, totalCost, securedAmount)

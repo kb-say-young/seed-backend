@@ -1,6 +1,7 @@
 package com.sayyoung.seed.domain.user.controller;
 
 import com.sayyoung.seed.domain.auth.dto.response.TokenResponse;
+import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisStatusResponse;
 import com.sayyoung.seed.domain.user.dto.request.IntakeRequest;
 import com.sayyoung.seed.domain.user.dto.request.LoginRequest;
 import com.sayyoung.seed.domain.user.dto.request.SignUpRequest;
@@ -76,23 +77,24 @@ public interface UserControllerDocs {
      *
      * @param userId  액세스 토큰에서 추출된 사용자 식별자
      * @param request 진단 정보 제출 요청
-     * @return 데이터가 없는 공통 응답
+     * @return 생성된 진단의 ID와 상태를 담은 공통 응답
      */
     @Operation(
             summary = "진단 정보 제출",
-            description = "로그인 이후 화면에서 입력한 기본 정보/소득·예산/목표를 저장합니다. 재제출 시 기본 정보는 갱신되고 목표는 전체 교체됩니다."
+            description = "로그인 이후 화면에서 입력한 기본 정보/소득·예산/목표를 저장하고 AI 진단까지 수행합니다. " +
+                    "재제출 시 기본 정보는 갱신되고 목표는 전체 교체됩니다. 응답의 diagnosisId로 결과를 조회할 수 있습니다."
     )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "201",
-                    description = "진단 정보 제출 성공"
+                    description = "진단 정보 제출 및 AI 진단 성공"
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "401",
                     description = "인증되지 않은 요청"
             )
     })
-    ResponseEntity<ApiResponse<Void>> submitIntake(
+    ResponseEntity<ApiResponse<DiagnosisStatusResponse>> submitIntake(
             @Parameter(hidden = true)
             @AuthenticationPrincipal Long userId,
             @Valid IntakeRequest request

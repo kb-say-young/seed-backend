@@ -13,6 +13,9 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MyRoadmapResponse {
 
+    @Schema(description = "기준이 된 진단 ID", example = "1")
+    private final Long diagnosisId;
+
     @Schema(description = "보호종료(예정)일(yyyy.MM)", example = "2024.02")
     private final String protectionEndYm;
 
@@ -23,11 +26,13 @@ public class MyRoadmapResponse {
     private final RoadmapSummaryResponse summary;
 
     public static MyRoadmapResponse of(
+            Long diagnosisId,
             String protectionEndYm,
             String planUntilYm,
             RoadmapSummaryResponse summary
     ) {
         return new MyRoadmapResponse(
+                diagnosisId,
                 protectionEndYm,
                 planUntilYm,
                 summary
