@@ -1,6 +1,7 @@
 package com.sayyoung.seed.domain.user.controller;
 
 import com.sayyoung.seed.domain.auth.dto.response.TokenResponse;
+import com.sayyoung.seed.domain.diagnosis.service.DiagnosisService;
 import com.sayyoung.seed.domain.user.dto.request.IntakeRequest;
 import com.sayyoung.seed.domain.user.dto.request.LoginRequest;
 import com.sayyoung.seed.domain.user.dto.request.SignUpRequest;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController implements UserControllerDocs {
 
     private final UserService userService;
+    private final DiagnosisService diagnosisService;
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<UserResponse>> signUp(
@@ -58,6 +60,11 @@ public class UserController implements UserControllerDocs {
         }
 
         userService.submitIntake(userId, request);
+
+        // 프로필/목표 저장이 커밋된 뒤에 별도로 AI 진단을 수행한다. diagnose() 내부는
+        // Dify 호출(느린 외부 HTTP) 구간 동안 DB 트랜잭션을 잡지 않도록 단계별로 독립
+        // 커밋하므로, submitIntake()의 @Transactional 안에서 호출하면 안 된다.
+        diagnosisService.diagnose(userId, request);
 
         return ResponseFactory.success(SuccessCode.COMMON_CREATED);
     }

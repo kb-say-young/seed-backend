@@ -1,6 +1,6 @@
 package com.sayyoung.seed.domain.diagnosis.controller;
 
-import java.time.LocalDate;
+import com.sayyoung.seed.domain.auth.jwt.JwtProvider;
 import com.sayyoung.seed.domain.diagnosis.client.DifyClient;
 import com.sayyoung.seed.domain.diagnosis.entity.ChecklistItem;
 import com.sayyoung.seed.domain.diagnosis.entity.Recommendation;
@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,6 +47,9 @@ class DiagnosisControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JwtProvider jwtProvider;
 
     @Autowired
     private UserRepository userRepository;
@@ -98,26 +102,34 @@ class DiagnosisControllerTest {
                 LocalDate.of(2001, 1, 1),
                 "01000000000"
         ));
+        String accessToken = jwtProvider.createAccessToken(user.getId());
         userGoalRepository.save(UserGoal.create(user, categoryRepository.findById(CATEGORY_CODE).orElseThrow(), "{}"));
         when(difyClient.run(any())).thenReturn("""
                 {
-                  "roadmap_items": [
-                    {
-                      "item_key": "ctrl_test_item",
-                      "origin_sub_category": "%s",
-                      "order_no": 1,
-                      "start_offset": { "value": 0, "unit": "week" },
-                      "duration": { "value": 1, "unit": "month" },
-                      "title": "테스트",
-                      "content": "테스트",
-                      "target_amount": 100000,
-                      "amount_type": "saving",
-                      "target_condition": null,
-                      "next_action": "테스트",
-                      "citation": null,
-                      "checklist": []
+                  "data": {
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": [
+                          {
+                            "item_key": "ctrl_test_item",
+                            "origin_sub_category": "%s",
+                            "order_no": 1,
+                            "start_offset": { "value": 0, "unit": "week" },
+                            "duration": { "value": 1, "unit": "month" },
+                            "title": "테스트",
+                            "content": "테스트",
+                            "target_amount": 100000,
+                            "amount_type": "saving",
+                            "target_condition": null,
+                            "next_action": "테스트",
+                            "citation": null,
+                            "checklist": []
+                          }
+                        ]
+                      }
                     }
-                  ]
+                  }
                 }
                 """.formatted(CATEGORY_CODE));
         String requestBody = """
@@ -148,7 +160,7 @@ class DiagnosisControllerTest {
         try {
             // when & then
             String location = mockMvc.perform(post("/api/diagnoses")
-                            .param("userId", String.valueOf(user.getId()))
+                            .header("Authorization", "Bearer " + accessToken)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
                     .andExpect(status().isSeeOther())

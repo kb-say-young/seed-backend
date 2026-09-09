@@ -1,9 +1,9 @@
 package com.sayyoung.seed.domain.diagnosis.mapper;
 
 
-import com.sayyoung.seed.domain.diagnosis.dto.request.DiagnosisRequestDto;
 import com.sayyoung.seed.domain.diagnosis.dto.request.DifyWorkflowRequestDto;
 import com.sayyoung.seed.domain.diagnosis.exception.DiagnosisErrorCode;
+import com.sayyoung.seed.domain.user.dto.request.IntakeRequest;
 import com.sayyoung.seed.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,11 +18,11 @@ public class DifyWorkflowMapper {
 
     public DifyWorkflowRequestDto toRequest(
             Long userId,
-            DiagnosisRequestDto requestDto
+            IntakeRequest requestDto
     ) {
         try {
             String userContext = objectMapper.writeValueAsString(
-                    requestDto.getUserProfileDto()
+                    requestDto.getUserProfile()
             );
 
             String goalsInput = objectMapper.writeValueAsString(
