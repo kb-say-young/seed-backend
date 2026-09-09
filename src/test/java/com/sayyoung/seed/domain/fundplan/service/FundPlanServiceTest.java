@@ -299,7 +299,7 @@ class FundPlanServiceTest {
             BigDecimal securedAmount
     ) {
         RoadmapSummaryResponse summary = RoadmapSummaryResponse.of(targetMonths, totalCost, securedAmount);
-        MyRoadmapResponse roadmap = MyRoadmapResponse.of(null, null, summary);
+        MyRoadmapResponse roadmap = MyRoadmapResponse.of(null, null, null, summary);
         when(diagnosisSummaryService.getMyRoadmap(USER_ID)).thenReturn(roadmap);
     }
 

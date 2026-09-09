@@ -1,5 +1,6 @@
 package com.sayyoung.seed.domain.diagnosis.dto.response;
 
+import com.sayyoung.seed.domain.diagnosis.entity.ChecklistItem;
 import com.sayyoung.seed.domain.diagnosis.entity.Recommendation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
@@ -7,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 로드맵(추천) 목록 조회 결과를 반환하는 DTO입니다.
@@ -53,14 +55,28 @@ public class RecommendationResponse {
     private final String status;
 
     /**
+     * 완료한 하위 체크리스트 항목 수입니다.
+     */
+    @Schema(description = "완료한 체크리스트 항목 수", example = "1")
+    private final int taskDoneCount;
+
+    /**
+     * 전체 하위 체크리스트 항목 수입니다.
+     */
+    @Schema(description = "전체 체크리스트 항목 수", example = "3")
+    private final int taskTotalCount;
+
+    /**
      * Recommendation 엔티티를 로드맵 응답 DTO로 변환합니다.
      *
      * @param recommendation 변환할 추천 엔티티
+     * @param checklistItems 하위 체크리스트 항목 목록 (완료·전체 개수 계산용)
      * @param status         하위 체크리스트로부터 파생한 상태
      * @return 변환된 로드맵 응답 DTO
      */
     public static RecommendationResponse from(
             Recommendation recommendation,
+            List<ChecklistItem> checklistItems,
             String status
     ) {
         return new RecommendationResponse(
@@ -69,7 +85,9 @@ public class RecommendationResponse {
                 recommendation.getCategory().getName(),
                 recommendation.getTargetAmount(),
                 recommendation.getNextAction(),
-                status
+                status,
+                (int) checklistItems.stream().filter(ChecklistItem::isDone).count(),
+                checklistItems.size()
         );
     }
 }

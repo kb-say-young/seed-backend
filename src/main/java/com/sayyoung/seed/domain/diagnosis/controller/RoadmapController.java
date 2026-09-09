@@ -12,6 +12,7 @@ import com.sayyoung.seed.global.response.code.SuccessCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,6 +62,23 @@ public class RoadmapController {
         }
 
         recommendationService.completeChecklistItem(userId, itemId, request);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 완료 처리한 체크리스트 항목을 다시 미완료로 되돌립니다.
+     */
+    @DeleteMapping("/roadmap/checklist-items/{itemId}/complete")
+    public ResponseEntity<Void> uncompleteChecklistItem(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long itemId
+    ) {
+        if (userId == null) {
+            throw new BusinessException(CommonErrorCode.UNAUTHORIZED);
+        }
+
+        recommendationService.uncompleteChecklistItem(userId, itemId);
 
         return ResponseEntity.noContent().build();
     }
