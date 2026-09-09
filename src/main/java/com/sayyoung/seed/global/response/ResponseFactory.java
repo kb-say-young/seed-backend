@@ -1,10 +1,10 @@
 package com.sayyoung.seed.global.response;
 
-import com.sayyoung.seed.global.response.code.CommonErrorCode;
 import com.sayyoung.seed.global.response.code.ErrorResponseCode;
 import com.sayyoung.seed.global.response.code.SuccessCode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -38,6 +38,21 @@ public final class ResponseFactory {
     }
 
     /**
+     * 페이지네이션 성공 응답을 생성합니다.
+     */
+    public static <T> ResponseEntity<PageApiResponse<T>> pageSuccess(
+            SuccessCode successCode,
+            Page<T> page
+    ) {
+        return ResponseEntity
+                .status(successCode.getHttpStatus())
+                .body(PageApiResponse.success(
+                        successCode,
+                        page
+                ));
+    }
+
+    /**
      * 기본 메시지를 사용하는 에러 응답을 생성합니다.
      */
     public static ResponseEntity<ApiResponse<Void>> failure(
@@ -57,6 +72,9 @@ public final class ResponseFactory {
     ) {
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
-                .body(ApiResponse.failure(errorCode, message));
+                .body(ApiResponse.failure(
+                        errorCode,
+                        message
+                ));
     }
 }
