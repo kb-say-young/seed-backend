@@ -9,12 +9,14 @@ import com.sayyoung.seed.domain.user.exception.UserErrorCode;
 import com.sayyoung.seed.domain.user.repository.UserRepository;
 import com.sayyoung.seed.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 
 /**
  * 정책 조회 비즈니스 로직을 처리한다.
@@ -31,9 +33,11 @@ public class PolicyServiceImpl implements PolicyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PolicyRecommendationResponseDto> getRecommendations(
+    public Page<PolicyRecommendationResponseDto> getRecommendations(
             Long userId,
-            String categoryId
+            String categoryId,
+            int page,
+            int size
     ) {
         // 현재 사용자 조회
         User user = userRepository.findById(userId).orElseThrow(
@@ -58,13 +62,23 @@ public class PolicyServiceImpl implements PolicyService {
                 .age(calculatedAge)
                 .build();
 
-        // QueryDSL 기반 맞춤 정책 조회
-        List<PolicyMatchResult> policies = policyRepository.findMatchedPolicies(condition);
+        // 페이지 요청 정보 생성
+        Pageable pageable = PageRequest.of(
+                page,
+                size
+        );
 
-        return policies
-                .stream()
-                .map(PolicyRecommendationResponseDto::from)
-                .toList();
+        // QueryDSL 기반 맞춤 정책 조회
+        Page<PolicyMatchResult> policies =
+                policyRepository.findMatchedPolicies(
+                        condition,
+                        pageable
+                );
+
+        // 내부 조회 결과를 API 응답 DTO로 변환
+        return policies.map(
+                PolicyRecommendationResponseDto::from
+        );
     }
 
     /**
