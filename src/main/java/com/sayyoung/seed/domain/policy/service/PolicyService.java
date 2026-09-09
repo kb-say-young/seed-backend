@@ -1,20 +1,21 @@
 package com.sayyoung.seed.domain.policy.service;
 
 import com.sayyoung.seed.domain.policy.dto.response.PolicyRecommendationResponseDto;
-
-import java.util.List;
+import com.sayyoung.seed.global.response.PageApiResponse;
+import org.springframework.data.domain.Page;
 
 /**
- * 정책 관련 기능을 제공하는 서비스 인터페이스.
+ * 정책 조회 비즈니스 로직을 정의한다.
  */
 public interface PolicyService {
 
     /**
-     * 카테고리와 사용자 정보를 기준으로 맞춤 정책을 조회한다.
+     * 사용자 정보와 카테고리를 기준으로 맞춤 정책을 페이지 단위로 조회한다.
      */
-    List<PolicyRecommendationResponseDto> getRecommendations(
+    Page<PolicyRecommendationResponseDto> getRecommendations(
             Long userId,
-            String categoryId
+            String categoryId,
+            int page,
+            int size
     );
-
 }

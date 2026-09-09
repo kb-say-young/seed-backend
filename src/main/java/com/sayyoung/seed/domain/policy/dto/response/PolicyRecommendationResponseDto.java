@@ -1,5 +1,6 @@
 package com.sayyoung.seed.domain.policy.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sayyoung.seed.domain.policy.dto.PolicyMatchResult;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,11 +8,18 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 
-/**
- * 맞춤 정책 조회 응답 DTO.
- */
+
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonPropertyOrder({
+        "id",
+        "name",
+        "description",
+        "institutionName",
+        "applyStartDate",
+        "applyEndDate",
+        "independentYouth"
+})
 public class PolicyRecommendationResponseDto {
 
     // 정책 ID

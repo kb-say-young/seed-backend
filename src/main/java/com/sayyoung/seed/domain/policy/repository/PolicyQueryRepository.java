@@ -2,6 +2,8 @@ package com.sayyoung.seed.domain.policy.repository;
 
 import com.sayyoung.seed.domain.policy.dto.PolicyMatchResult;
 import com.sayyoung.seed.domain.policy.dto.PolicyFilterCondition;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -13,7 +15,8 @@ public interface PolicyQueryRepository {
     /**
      * 조건에 맞는 정책을 조회한다.
      */
-    List<PolicyMatchResult> findMatchedPolicies(
-            PolicyFilterCondition condition
+    Page<PolicyMatchResult> findMatchedPolicies(
+            PolicyFilterCondition condition,
+            Pageable pageable
     );
 }
