@@ -1,5 +1,6 @@
 package com.sayyoung.seed.domain.diagnosis.service;
 
+import java.time.LocalDate;
 import com.sayyoung.seed.domain.diagnosis.client.DifyClient;
 import com.sayyoung.seed.domain.diagnosis.dto.request.DiagnosisRequestDto;
 import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisStatusResponse;
@@ -150,7 +151,7 @@ class DiagnosisServiceImplTest {
         return userRepository.save(User.create(
                 "diag_test_" + UUID.randomUUID().toString().substring(0, 8),
                 "테스트유저",
-                "20010101",
+                LocalDate.of(2001, 1, 1),
                 "01000000000"
         ));
     }

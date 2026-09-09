@@ -150,7 +150,7 @@ class DiagnosisSummaryServiceTest {
 
         // given
         User user = userRepository.findById(SEEDED_USER_ID).orElseThrow();
-        user.updateProfile(null, null, BigDecimal.valueOf(5_000_000), null, null, null, null);
+        user.updateProfile(null, null, BigDecimal.valueOf(5_000_000), null, null, null, null, null);
         userRepository.save(user);
 
         Diagnosis diagnosis = diagnosisRepository.save(Diagnosis.create(user));
@@ -186,7 +186,7 @@ class DiagnosisSummaryServiceTest {
             assertThat(response.getMonthlyTargetSaving()).isEqualByComparingTo(BigDecimal.ZERO);
         } finally {
             diagnosisRepository.deleteById(diagnosis.getId());
-            user.updateProfile(null, null, null, null, null, null, null);
+            user.updateProfile(null, null, null, null, null, null, null, null);
             userRepository.save(user);
         }
     }
@@ -273,7 +273,7 @@ class DiagnosisSummaryServiceTest {
 
         // given
         String loginId = "rm_" + UUID.randomUUID().toString().substring(0, 8);
-        User user = userRepository.save(User.create(loginId, "테스트", LocalDate.of(2000, 1, 1), "01000000000", "대학재학"));
+        User user = userRepository.save(User.create(loginId, "테스트", LocalDate.of(2000, 1, 1), "01000000000"));
 
         try {
             // when & then

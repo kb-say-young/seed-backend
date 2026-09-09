@@ -58,4 +58,16 @@ public class UserProfileRequest {
     @NotNull(message = "가구원 수는 필수입니다.")
     @Positive(message = "가구원 수는 1명 이상이어야 합니다.")
     private Integer householdSize;
+
+    @Schema(
+            description = "학력",
+            example = "대학재학",
+            allowableValues = {"고졸미만", "고교재학", "고졸예정", "고교졸업", "대학재학", "대졸예정", "대학졸업", "석박사", "기타"}
+    )
+    @NotBlank(message = "학력은 필수입니다.")
+    @Pattern(
+            regexp = "고졸미만|고교재학|고졸예정|고교졸업|대학재학|대졸예정|대학졸업|석박사|기타",
+            message = "학력은 고졸미만, 고교재학, 고졸예정, 고교졸업, 대학재학, 대졸예정, 대학졸업, 석박사, 기타 중 하나여야 합니다."
+    )
+    private String education;
 }

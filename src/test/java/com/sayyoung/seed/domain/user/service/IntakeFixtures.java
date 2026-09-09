@@ -29,6 +29,7 @@ final class IntakeFixtures {
         set(userProfile, "income", 1_500_000L);
         set(userProfile, "basicRecipient", false);
         set(userProfile, "householdSize", 1);
+        set(userProfile, "education", "대학재학");
 
         GoalRequest goal = newInstance(GoalRequest.class);
         set(goal, "parentCategoryId", categoryId.substring(0, 1));

@@ -36,7 +36,7 @@ class UserIntakePersistenceTest {
     @Test void 실제_DB에_정보를_저장하고_다시_조회한다() {
         User user = users.saveAndFlush(User.create(
                 "verify_" + UUID.randomUUID().toString().substring(0, 20),
-                "테스트유저", LocalDate.of(1999, 1, 1), "01099998888", "대학재학"
+                "테스트유저", LocalDate.of(1999, 1, 1), "01099998888"
         ));
         var request = request("13");
         service.submitIntake(user.getId(), request);
@@ -58,7 +58,7 @@ class UserIntakePersistenceTest {
     @Test void 재제출하면_목표_목록을_교체한다() {
         User user = users.saveAndFlush(User.create(
                 "verify_" + UUID.randomUUID().toString().substring(0, 20),
-                "테스트유저", LocalDate.of(1999, 1, 1), "01099998888", "대학재학"
+                "테스트유저", LocalDate.of(1999, 1, 1), "01099998888"
         ));
         service.submitIntake(user.getId(), request("13"));
         entityManager.flush(); entityManager.clear();

@@ -66,8 +66,7 @@ public class UserService {
                 request.getLoginId(),
                 request.getName(),
                 request.getBirthDate(),
-                request.getPhoneNumber(),
-                request.getEducation()
+                request.getPhoneNumber()
         );
         userRepository.save(user);
 
@@ -122,7 +121,8 @@ public class UserService {
                 profile.getRegionCode(),
                 profile.getIncome(),
                 profile.getBasicRecipient(),
-                profile.getHouseholdSize().shortValue()
+                profile.getHouseholdSize().shortValue(),
+                profile.getEducation()
         );
 
         userGoalRepository.deleteAllByUserId(userId);
