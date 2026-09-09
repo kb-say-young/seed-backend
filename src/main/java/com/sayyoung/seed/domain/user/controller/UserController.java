@@ -1,6 +1,7 @@
 package com.sayyoung.seed.domain.user.controller;
 
 import com.sayyoung.seed.domain.auth.dto.response.TokenResponse;
+import com.sayyoung.seed.domain.diagnosis.dto.response.DiagnosisStatusResponse;
 import com.sayyoung.seed.domain.diagnosis.service.DiagnosisService;
 import com.sayyoung.seed.domain.user.dto.request.IntakeRequest;
 import com.sayyoung.seed.domain.user.dto.request.LoginRequest;
@@ -51,7 +52,7 @@ public class UserController implements UserControllerDocs {
     }
 
     @PostMapping("/me/intake")
-    public ResponseEntity<ApiResponse<Void>> submitIntake(
+    public ResponseEntity<ApiResponse<DiagnosisStatusResponse>> submitIntake(
             @AuthenticationPrincipal Long userId,
             @Valid @RequestBody IntakeRequest request
     ) {
@@ -64,8 +65,11 @@ public class UserController implements UserControllerDocs {
         // 프로필/목표 저장이 커밋된 뒤에 별도로 AI 진단을 수행한다. diagnose() 내부는
         // Dify 호출(느린 외부 HTTP) 구간 동안 DB 트랜잭션을 잡지 않도록 단계별로 독립
         // 커밋하므로, submitIntake()의 @Transactional 안에서 호출하면 안 된다.
-        diagnosisService.diagnose(userId, request);
+        Long diagnosisId = diagnosisService.diagnose(userId, request);
 
-        return ResponseFactory.success(SuccessCode.COMMON_CREATED);
+        // 프론트가 어떤 진단 결과를 조회해야 하는지 알 수 있도록 diagnosisId/status를 응답에 담는다.
+        DiagnosisStatusResponse response = diagnosisService.getDiagnosis(diagnosisId);
+
+        return ResponseFactory.success(SuccessCode.COMMON_CREATED, response);
     }
 }

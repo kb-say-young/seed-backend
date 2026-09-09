@@ -284,6 +284,7 @@ class DiagnosisSummaryServiceTest {
             MyRoadmapResponse response = diagnosisSummaryService.getMyRoadmap(SEEDED_USER_ID);
 
             // then
+            assertThat(response.getDiagnosisId()).isEqualTo(diagnosis.getId());
             assertThat(response.getSummary().getTargetMonths()).isEqualTo(5);
             assertThat(response.getSummary().getTotalCost()).isEqualByComparingTo(BigDecimal.valueOf(1_000_000));
             // 사용자 2의 fixed_budget이 NULL이라 0
