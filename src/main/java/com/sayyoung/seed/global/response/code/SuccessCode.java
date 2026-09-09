@@ -27,6 +27,12 @@ public enum SuccessCode implements ResponseCode {
             HttpStatus.OK,
             "POLICY_200_001",
             "맞춤 정책 조회에 성공했습니다."
+    ),
+
+    POLICY_DETAIL_READ_SUCCESS(
+            HttpStatus.OK,
+        "POLICY_200_002",
+                "정책 상세 조회에 성공했습니다."
     );
 
     private final HttpStatus httpStatus;

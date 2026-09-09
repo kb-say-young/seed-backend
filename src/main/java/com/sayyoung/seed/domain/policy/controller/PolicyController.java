@@ -1,5 +1,6 @@
 package com.sayyoung.seed.domain.policy.controller;
 
+import com.sayyoung.seed.domain.policy.dto.response.PolicyDetailResponseDto;
 import com.sayyoung.seed.domain.policy.dto.response.PolicyRecommendationResponseDto;
 import com.sayyoung.seed.domain.policy.service.PolicyService;
 import com.sayyoung.seed.global.response.ApiResponse;
@@ -10,13 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
- * 사용자 맞춤 정책 조회를 처리하는 컨트롤러.
+ * 정책 관련 API를 처리합니다.
  */
 @RestController
 @RequestMapping("/api/policies")
@@ -26,7 +24,7 @@ public class PolicyController {
     private final PolicyService policyService;
 
     /**
-     * 카테고리와 사용자 정보를 기준으로 맞춤 정책을 페이지 단위로 조회한다.
+     * 사용자 정보를 기반으로 맞춤 정책을 페이지 단위로 조회합니다.
      */
     @GetMapping("/recommendations")
     public ResponseEntity<PageApiResponse<PolicyRecommendationResponseDto>> getRecommendations(
@@ -45,6 +43,21 @@ public class PolicyController {
 
         return ResponseFactory.pageSuccess(
                 SuccessCode.POLICY_RECOMMENDATION_READ_SUCCESS,
+                response
+        );
+    }
+
+    /**
+     * 정책 ID를 기준으로 정책 상세 정보를 조회합니다.
+     */
+    @GetMapping("/{policyId}")
+    public ResponseEntity<ApiResponse<PolicyDetailResponseDto>> getPolicyDetail(
+            @PathVariable Long policyId
+    ) {
+        PolicyDetailResponseDto response = policyService.getPolicyDetail(policyId);
+
+        return ResponseFactory.success(
+                SuccessCode.POLICY_DETAIL_READ_SUCCESS,
                 response
         );
     }

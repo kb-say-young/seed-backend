@@ -1,7 +1,8 @@
 package com.sayyoung.seed.domain.policy.service;
 
+import com.sayyoung.seed.domain.policy.dto.response.PolicyDetailResponseDto;
+import com.sayyoung.seed.domain.policy.dto.response.YouthPolicyApiDetailResponseDto;
 import com.sayyoung.seed.domain.policy.dto.response.PolicyRecommendationResponseDto;
-import com.sayyoung.seed.global.response.PageApiResponse;
 import org.springframework.data.domain.Page;
 
 /**
@@ -17,5 +18,12 @@ public interface PolicyService {
             String categoryId,
             int page,
             int size
+    );
+
+    /**
+     * 정책 상세 정보를 조회합니다.
+     */
+    PolicyDetailResponseDto getPolicyDetail(
+            Long policyId
     );
 }
