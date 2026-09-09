@@ -52,23 +52,30 @@ class DiagnosisSummaryServiceTest {
         String itemKey = "summary_test_" + UUID.randomUUID();
         String rawJson = """
                 {
-                  "roadmap_items": [
-                    {
-                      "item_key": "%s",
-                      "origin_sub_category": "23",
-                      "order_no": 1,
-                      "start_offset": { "value": 2, "unit": "week" },
-                      "duration": { "value": 5, "unit": "month" },
-                      "title": "테스트 추천 항목",
-                      "content": "테스트 상세 내용",
-                      "target_amount": 1200000,
-                      "amount_type": "saving",
-                      "target_condition": null,
-                      "next_action": "테스트 다음 행동",
-                      "citation": null,
-                      "checklist": []
+                  "data": {
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": [
+                          {
+                            "item_key": "%s",
+                            "origin_sub_category": "23",
+                            "order_no": 1,
+                            "start_offset": { "value": 2, "unit": "week" },
+                            "duration": { "value": 5, "unit": "month" },
+                            "title": "테스트 추천 항목",
+                            "content": "테스트 상세 내용",
+                            "target_amount": 1200000,
+                            "amount_type": "saving",
+                            "target_condition": null,
+                            "next_action": "테스트 다음 행동",
+                            "citation": null,
+                            "checklist": []
+                          }
+                        ]
+                      }
                     }
-                  ]
+                  }
                 }
                 """.formatted(itemKey);
         diagnosisResultService.applyRoadmap(diagnosis.getId(), rawJson);
@@ -98,38 +105,45 @@ class DiagnosisSummaryServiceTest {
         String expenseItemKey = "expense_item_" + UUID.randomUUID();
         String rawJson = """
                 {
-                  "roadmap_items": [
-                    {
-                      "item_key": "%s",
-                      "origin_sub_category": "23",
-                      "order_no": 1,
-                      "start_offset": { "value": 0, "unit": "month" },
-                      "duration": { "value": 4, "unit": "month" },
-                      "title": "저축 추천 항목",
-                      "content": "테스트 상세 내용",
-                      "target_amount": 500000,
-                      "amount_type": "saving",
-                      "target_condition": null,
-                      "next_action": "테스트 다음 행동",
-                      "citation": null,
-                      "checklist": []
-                    },
-                    {
-                      "item_key": "%s",
-                      "origin_sub_category": "23",
-                      "order_no": 2,
-                      "start_offset": { "value": 0, "unit": "month" },
-                      "duration": { "value": 4, "unit": "month" },
-                      "title": "지출 감소 추천 항목",
-                      "content": "테스트 상세 내용",
-                      "target_amount": 300000,
-                      "amount_type": "expense",
-                      "target_condition": null,
-                      "next_action": "테스트 다음 행동",
-                      "citation": null,
-                      "checklist": []
+                  "data": {
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": [
+                          {
+                            "item_key": "%s",
+                            "origin_sub_category": "23",
+                            "order_no": 1,
+                            "start_offset": { "value": 0, "unit": "month" },
+                            "duration": { "value": 4, "unit": "month" },
+                            "title": "저축 추천 항목",
+                            "content": "테스트 상세 내용",
+                            "target_amount": 500000,
+                            "amount_type": "saving",
+                            "target_condition": null,
+                            "next_action": "테스트 다음 행동",
+                            "citation": null,
+                            "checklist": []
+                          },
+                          {
+                            "item_key": "%s",
+                            "origin_sub_category": "23",
+                            "order_no": 2,
+                            "start_offset": { "value": 0, "unit": "month" },
+                            "duration": { "value": 4, "unit": "month" },
+                            "title": "지출 감소 추천 항목",
+                            "content": "테스트 상세 내용",
+                            "target_amount": 300000,
+                            "amount_type": "expense",
+                            "target_condition": null,
+                            "next_action": "테스트 다음 행동",
+                            "citation": null,
+                            "checklist": []
+                          }
+                        ]
+                      }
                     }
-                  ]
+                  }
                 }
                 """.formatted(savingItemKey, expenseItemKey);
         diagnosisResultService.applyRoadmap(diagnosis.getId(), rawJson);
@@ -157,23 +171,30 @@ class DiagnosisSummaryServiceTest {
         String itemKey = "over_budget_item_" + UUID.randomUUID();
         String rawJson = """
                 {
-                  "roadmap_items": [
-                    {
-                      "item_key": "%s",
-                      "origin_sub_category": "23",
-                      "order_no": 1,
-                      "start_offset": { "value": 0, "unit": "month" },
-                      "duration": { "value": 4, "unit": "month" },
-                      "title": "저축 추천 항목",
-                      "content": "테스트 상세 내용",
-                      "target_amount": 1000000,
-                      "amount_type": "saving",
-                      "target_condition": null,
-                      "next_action": "테스트 다음 행동",
-                      "citation": null,
-                      "checklist": []
+                  "data": {
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": [
+                          {
+                            "item_key": "%s",
+                            "origin_sub_category": "23",
+                            "order_no": 1,
+                            "start_offset": { "value": 0, "unit": "month" },
+                            "duration": { "value": 4, "unit": "month" },
+                            "title": "저축 추천 항목",
+                            "content": "테스트 상세 내용",
+                            "target_amount": 1000000,
+                            "amount_type": "saving",
+                            "target_condition": null,
+                            "next_action": "테스트 다음 행동",
+                            "citation": null,
+                            "checklist": []
+                          }
+                        ]
+                      }
                     }
-                  ]
+                  }
                 }
                 """.formatted(itemKey);
         diagnosisResultService.applyRoadmap(diagnosis.getId(), rawJson);
@@ -230,23 +251,30 @@ class DiagnosisSummaryServiceTest {
         String itemKey = "my_roadmap_item_" + UUID.randomUUID();
         String rawJson = """
                 {
-                  "roadmap_items": [
-                    {
-                      "item_key": "%s",
-                      "origin_sub_category": "23",
-                      "order_no": 1,
-                      "start_offset": { "value": 0, "unit": "month" },
-                      "duration": { "value": 5, "unit": "month" },
-                      "title": "테스트 추천 항목",
-                      "content": "테스트 상세 내용",
-                      "target_amount": 1000000,
-                      "amount_type": "saving",
-                      "target_condition": null,
-                      "next_action": "테스트 다음 행동",
-                      "citation": null,
-                      "checklist": []
+                  "data": {
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": [
+                          {
+                            "item_key": "%s",
+                            "origin_sub_category": "23",
+                            "order_no": 1,
+                            "start_offset": { "value": 0, "unit": "month" },
+                            "duration": { "value": 5, "unit": "month" },
+                            "title": "테스트 추천 항목",
+                            "content": "테스트 상세 내용",
+                            "target_amount": 1000000,
+                            "amount_type": "saving",
+                            "target_condition": null,
+                            "next_action": "테스트 다음 행동",
+                            "citation": null,
+                            "checklist": []
+                          }
+                        ]
+                      }
                     }
-                  ]
+                  }
                 }
                 """.formatted(itemKey);
         diagnosisResultService.applyRoadmap(diagnosis.getId(), rawJson);

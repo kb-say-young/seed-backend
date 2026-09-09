@@ -106,23 +106,30 @@ class DiagnosisControllerTest {
         userGoalRepository.save(UserGoal.create(user, categoryRepository.findById(CATEGORY_CODE).orElseThrow(), "{}"));
         when(difyClient.run(any())).thenReturn("""
                 {
-                  "roadmap_items": [
-                    {
-                      "item_key": "ctrl_test_item",
-                      "origin_sub_category": "%s",
-                      "order_no": 1,
-                      "start_offset": { "value": 0, "unit": "week" },
-                      "duration": { "value": 1, "unit": "month" },
-                      "title": "테스트",
-                      "content": "테스트",
-                      "target_amount": 100000,
-                      "amount_type": "saving",
-                      "target_condition": null,
-                      "next_action": "테스트",
-                      "citation": null,
-                      "checklist": []
+                  "data": {
+                    "status": "succeeded",
+                    "outputs": {
+                      "structured_output": {
+                        "roadmap_items": [
+                          {
+                            "item_key": "ctrl_test_item",
+                            "origin_sub_category": "%s",
+                            "order_no": 1,
+                            "start_offset": { "value": 0, "unit": "week" },
+                            "duration": { "value": 1, "unit": "month" },
+                            "title": "테스트",
+                            "content": "테스트",
+                            "target_amount": 100000,
+                            "amount_type": "saving",
+                            "target_condition": null,
+                            "next_action": "테스트",
+                            "citation": null,
+                            "checklist": []
+                          }
+                        ]
+                      }
                     }
-                  ]
+                  }
                 }
                 """.formatted(CATEGORY_CODE));
         String requestBody = """
