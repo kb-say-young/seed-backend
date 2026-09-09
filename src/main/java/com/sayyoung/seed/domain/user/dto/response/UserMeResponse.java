@@ -76,6 +76,9 @@ public class UserMeResponse {
         @Schema(description = "지역 표시명(시/도 + 시/군/구)", example = "서울특별시 종로구")
         private final String regionDisplay;
 
+        @Schema(description = "학력. 온보딩 드롭다운 문자열 그대로(코드 매핑 없음)", example = "고교졸업")
+        private final String education;
+
         @Schema(description = "소득")
         private final Long income;
 
@@ -108,6 +111,7 @@ public class UserMeResponse {
                     user.getBasicRecipient(),
                     user.getRegionCode(),
                     regionDisplay,
+                    user.getEducation(),
                     user.getIncome(),
                     user.getHouseholdSize(),
                     user.getFixedBudget(),
